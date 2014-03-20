@@ -1,0 +1,84 @@
+<!-- INCLUDE overall_header.html -->
+
+<a name="maincontent"></a>
+
+<h1>{L_ACP_EXPORT_IMPORT_USERS}</h1>
+
+<p>{L_ACP_EXPORT_IMPORT_USERS_EXPLAIN}</p>
+<a href="{EXPORTURL}">Export users</a>
+<!-- IF S_ERROR -->
+	<div class="{BOX}">
+		<h3>{L_WARNING}</h3>
+		<p>{ERROR}</p>
+	</div>
+    <form id="acp_password_upload" name="acp_password_upload" method="post" action="" enctype="multipart/form-data">
+    <input type="file" name="uploadfile" size="40" maxlength="40" value="" class="btnfile" /> 
+    <input type="hidden" id="action" name="action" value="add_file" /><input class="button1" type="submit" name="submit" value="Add file" />
+    </form>
+<!-- ELSE -->
+<form id="acp_password" method="post" action="">
+<fieldset>
+    <legend>Existing users</legend>
+    <table style="width:100%;">
+    <tr>
+        <th style=" width:3%;">ID</th>
+        <th style=" width:7%;">New ID</th>
+        <th>User name</th>
+        <th>New name</th>
+        <th>E-mail</th>
+        <th>New E-mail</th>
+        <th>City</th>
+        <th>New City</th>
+        <th>Valid</th>
+    </tr>
+    <!-- BEGIN members -->
+        <tr title="{members.TOOLTIP}" <!-- IF members.S_ROW_COUNT is even -->class="row1"<!-- ELSE -->class="row2"<!-- ENDIF -->>
+            <td>{members.ID}</td>
+            <td>{members.NEWID}</td>
+            <td>{members.NAME}</td>
+            <td>{members.NEWNAME}</td>
+            <td>{members.EMAIL}</td>
+            <td>{members.NEWEMAIL}</td>
+            <td>{members.CITY}</td>
+            <td>{members.NEWCITY}<!-- IF members.VALIDATED --><input type="hidden" id="userid[{members.ID}]" name="userid[{members.ID}]" value="{members.ID}" /><!-- ENDIF --></td>
+            <td style="text-align:center;">{members.VALIDATED}</td>
+        </tr>
+        <!-- END members -->
+    </table>
+    <p><input type="hidden" id="action" name="action" value="save" /><input class="button1" type="submit" id="submit" name="submit"{DISABLED} value="{L_SUBMIT}" /></p>
+</fieldset>
+</form>
+<!-- IF .membersnotfound -->
+<form id="acp_password" method="post" action="">
+<fieldset>
+    <legend>Non existing users</legend>
+    <table style="width:100%;">
+    <tr>
+        <th style=" width:3%;">ID</th>
+        <th style=" width:7%;">New ID</th>
+        <th>New name</th>
+        <th>New E-mail</th>
+        <th>New City</th>
+        <th>Valid</th>
+    </tr>
+    <!-- BEGIN membersnotfound -->
+        <tr title="{membersnotfound.TOOLTIP}" <!-- IF membersnotfound.S_ROW_COUNT is even -->class="row1"<!-- ELSE -->class="row2"<!-- ENDIF -->>
+            <td>{membersnotfound.ID}</td>
+            <td>{membersnotfound.NEWID}</td>
+            <td>{membersnotfound.NEWNAME}</td>
+            <td>{membersnotfound.NEWEMAIL}</td>
+            <td>{membersnotfound.NEWCITY}<!-- IF membersnotfound.VALIDATED --><input type="hidden" id="userid[{membersnotfound.ID}]" name="userid[{membersnotfound.ID}]" value="{membersnotfound.ID}" /><!-- ENDIF --></td>
+            <td style="text-align:center;">{membersnotfound.VALIDATED}</td>
+        </tr>
+        <!-- END membersnotfound -->
+    </table>
+    <p><input type="hidden" id="action" name="action" value="save" /><input class="button1" type="submit" id="submit" name="submit"{DISABLED} value="Insert" /></p>
+</fieldset>
+</form>
+<!-- ENDIF -->
+    <form id="acp_password_upload" name="acp_password_upload" method="post" action="" enctype="multipart/form-data">
+    <input type="file" name="uploadfile" size="40" maxlength="40" value="" class="btnfile" /> 
+    <input type="hidden" id="action" name="action" value="add_file" /><input class="button1" type="submit" name="submit" value="Add file" />
+    </form>
+<!-- ENDIF -->
+<!-- INCLUDE overall_footer.html -->
