@@ -60,14 +60,37 @@ function parse_user($mvalues)
     return new export_import_users_update($user_values);
 }
 
-function validate_import($importname = '', $newpassword = '', $newemail = '')
+function validate_import($importname = '', $newpassword = '', $newemail = '', $checkdbname = false)
 {
-	global $db, $config, $phpbb_root_path, $phpEx,  $disabled;
-	$enablename = $enablepass = $enableemail = false;
+	global $db, $config, $user, $phpbb_root_path, $phpEx;
 	if (!function_exists('validate_string'))
 	{
 		include_once($phpbb_root_path . 'includes/functions_user.' . $phpEx);
 	}
+	
+	$user->add_lang(array('ucp'));
+	$error = array();
+	$err = validate_string($importname, false, $config['min_name_chars'], $config['max_name_chars']);
+	($err) ? $error[] = $user->lang[$err] : NULL;
+	$err = validate_username($importname, 'allowed name');
+	($checkdbname && $err == 'USERNAME_TAKEN') ? $error[] = $user->lang[$err . '_USERNAME'] : NULL;
+	($err && $err != 'USERNAME_TAKEN') ? $error[] = $user->lang[$err . '_USERNAME'] : NULL;
+	$err = filter_var($newemail, FILTER_VALIDATE_EMAIL);
+	(!$err) ? $error[] = $user->lang['NO_EMAILS_DEFINED'] : NULL;
+	if (strlen($newpassword) == 60 || strlen($newpassword) == 34)
+	{
+		if ((strlen($newpassword) == 34 && (substr($newpassword, 0,3) == '$H$' || substr($newpassword, 0,3) == '$P$')) || (strlen($newpassword) == 60 && (substr($newpassword, 0,3) == '$2y')))
+		{
+			$err = false;
+		}
+	} else 
+	{
+		$err = $user->lang['WRONG_PASSWORD'];
+	}
+	($err) ? $error[] = $err : NULL;
+	return $error;
+
+/*
 
 	if (validate_string($importname, false, $config['min_name_chars'], $config['max_name_chars']) === false && !validate_username($importname))
 	{
@@ -91,5 +114,6 @@ function validate_import($importname = '', $newpassword = '', $newemail = '')
 		$disabled = false;
 		return false;
 	}
+*/
 }
 ?>
