@@ -18,6 +18,11 @@
         "phpbb/phpbb": "3.1.*@dev"
     },
     "extra": {
-        "display-name": "Export / Import Users"
+        "display-name": "Export / Import Users",
+		"version-check": {
+			"host": "forumhulp.com",
+			"directory": "/ext",
+			"filename": "index.php?id=24"
+		}
     }
 }
