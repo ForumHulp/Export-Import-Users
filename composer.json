@@ -19,6 +19,9 @@
     },
     "extra": {
         "display-name": "Export / Import Users",
+		"soft-require": {
+           "phpbb/phpbb": "3.1.*@dev"
+        },
 		"version-check": {
 			"host": "forumhulp.com",
 			"directory": "/ext",
