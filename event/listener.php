@@ -36,6 +36,7 @@ class listener implements EventSubscriberInterface
     {
         return array(
             'core.get_logs_modify_entry_data'	=> 'edit_additional_data',
+			'core.user_setup'					=> 'load_language_on_setup',
 		);
     }
 
@@ -52,4 +53,14 @@ class listener implements EventSubscriberInterface
 		}
 		$event['row'] = $additional_data;
    }
+
+	public function load_language_on_setup($event)
+	{
+		$lang_set_ext = $event['lang_set_ext'];
+		$lang_set_ext[] = array(
+			'ext_name' => 'forumhulp/export_import_users',
+			'lang_set' => 'acp/info_acp_export_import_users',
+		);
+		$event['lang_set_ext'] = $lang_set_ext;
+	}
 }
