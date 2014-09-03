@@ -1,7 +1,0 @@
-services:
-    forumhulp.export_import_users.listener:
-        class: forumhulp\export_import_users\event\listener
-        arguments:
-            - @controller.helper
-        tags:
-            - { name: event.listener }
