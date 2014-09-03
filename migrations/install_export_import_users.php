@@ -7,7 +7,7 @@
 *
 */
 
-namespace forumhulp\export_import_users\migrations;
+namespace forumhulp\exportimportusers\migrations;
 
 class install_export_import_users extends \phpbb\db\migration\migration
 {
@@ -18,7 +18,7 @@ class install_export_import_users extends \phpbb\db\migration\migration
 
 	static public function depends_on()
 	{
-		 return array('\phpbb\db\migration\data\v310\dev');
+		return array('\phpbb\db\migration\data\v310\dev');
 	}
 
 	public function update_data()

@@ -7,7 +7,7 @@
 *
 */
 
-namespace forumhulp\export_import_users\event;
+namespace forumhulp\exportimportusers\event;
 
 /**
 * @ignore
@@ -19,29 +19,29 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 */
 class listener implements EventSubscriberInterface
 {
-    /* @var \phpbb\controller\helper */
-    protected $helper;
-  
-    /**
-    * Constructor
-    *
-    * @param \phpbb\controller\helper    $helper        Controller helper object
-    */
-    public function __construct(\phpbb\controller\helper $helper)
-    {
-        $this->helper = $helper;
-    }
+	/* @var \phpbb\controller\helper */
+	protected $helper;
 
-    static public function getSubscribedEvents()
-    {
-        return array(
-            'core.get_logs_modify_entry_data'	=> 'edit_additional_data',
+	/**
+	* Constructor
+	*
+	* @param \phpbb\controller\helper    $helper        Controller helper object
+	*/
+	public function __construct(\phpbb\controller\helper $helper)
+	{
+		$this->helper = $helper;
+	}
+
+	static public function getSubscribedEvents()
+	{
+		return array(
+			'core.get_logs_modify_entry_data'	=> 'edit_additional_data',
 			'core.user_setup'					=> 'load_language_on_setup',
 		);
-    }
+	}
 
-    public function edit_additional_data($event)
-    {
+	public function edit_additional_data($event)
+	{
 		global $_SID ;
 		$additional_data = $event['row'];
 		foreach($additional_data as $key => $value)
@@ -58,7 +58,7 @@ class listener implements EventSubscriberInterface
 	{
 		$lang_set_ext = $event['lang_set_ext'];
 		$lang_set_ext[] = array(
-			'ext_name' => 'forumhulp/export_import_users',
+			'ext_name' => 'forumhulp/exportimportusers',
 			'lang_set' => 'acp/info_acp_export_import_users',
 		);
 		$event['lang_set_ext'] = $lang_set_ext;

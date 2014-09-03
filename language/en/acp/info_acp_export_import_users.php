@@ -25,10 +25,8 @@ $name = 'Export_import_users ' . $revision;
 
 $lang = array_merge($lang, array(
 	'ACP_EXPORT_IMPORT_USERS'	=> 'Ex- Import Users',
-	
+
 	'ACP_EXPORT_IMPORT_USERS_EXPLAIN'	=> 'Ex- Import users from other phpBB usertables. Existing users will be updated, non excisting users will be added. You can only update or insert users if all are valid. The xml file will be deleted after insert or update. ',
 	'LOG_USER_ERROR' => '<strong>Users not inserted or updated</strong><br />» %s',
 	'LOG_USER_CHANGE' => '<strong>Users updated</strong><br />» %s'
 ));
-
-?>

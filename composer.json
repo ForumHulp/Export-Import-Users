@@ -1,5 +1,5 @@
 {
-    "name": "forumhulp/export_import_users",
+    "name": "forumhulp/exportimportusers",
     "type": "phpbb-extension",
 		"description": "With this extension you can import and export your users. The installer wil activate a new menu-item under tab User and Groups -> Users. The export is a xml file and when importing it it should be stored in your store folder. Once imported the file will delete automaticcaly. Only valid users can be updated / inserted.",
     "homepage": "http://forumhulp.com/",

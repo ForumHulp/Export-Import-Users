@@ -7,9 +7,9 @@
 *
 */
 
-namespace forumhulp\export_import_users\acp;
+namespace forumhulp\exportimportusers\acp;
 
-class export_import_users_module
+class exportimport_users_module
 {
 	var $u_action;
 
@@ -17,14 +17,14 @@ class export_import_users_module
 	{
 		global $config, $db, $user, $auth, $template, $cache;
 		global $phpbb_root_path, $phpbb_admin_path, $phpEx, $phpbb_container, $disabled, $request;
-		include('functions_export_import_users.' . $phpEx);
-	
+		include('../../exportimportusers/acp/functions_export_import_users.' . $phpEx);
+
 		$submit	= (isset($_POST['submit'])) ? true : false;
 		$action	= $request->variable('action', '');
 		$user_ids = $request->variable('userid', array(0));
 
 		$this->tpl_name = 'acp_export_import_users';
-		
+
 		$sql = 'SELECT field_name FROM ' . PROFILE_FIELDS_TABLE . ' WHERE field_active = 1';
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
@@ -57,12 +57,12 @@ class export_import_users_module
 							$xml .= "\t\t<username>".$value['username']."</username>\n"; 
 							$xml .= "\t\t<user_email>".$value['user_email']."</user_email>\n";   
 							$xml .= "\t\t<user_birthday>".$value['user_birthday']."</user_birthday>\n"; 
-							
+
 							foreach($profilearay as $id => $fieldvalue)
 							{
 								$xml .= "\t\t<".$fieldvalue.">".isset($value[$fieldvalue]) ? $value[$fieldvalue] : ''."</".$fieldvalue.">\n";     
 							}
-							
+
 							$xml .= "\t\t<user_from>".$profile_fields[$value['user_id']]['phpbb_location']['value']."</user_from>\n";     
 							$xml .= "\t\t<user_website>".$profile_fields[$value['user_id']]['phpbb_website']['value']."</user_website>\n";     
 							$xml .= "\t\t<user_occ>".$profile_fields[$value['user_id']]['phpbb_occupation']['value']."</user_occ>\n";     
@@ -96,7 +96,7 @@ class export_import_users_module
 									'user_birthday'	=> $value['user_birthday']);
 							} else
 							{
-								$sql = 'SELECT user_id, username, user_email FROM ' . USERS_TABLE . ' 
+								$sql = 'SELECT user_id, username, user_email FROM ' . USERS_TABLE . '
 										WHERE (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';				
 								$result = $db->sql_query($sql);
 								$row = $db->sql_fetchrow($result);
@@ -133,7 +133,7 @@ class export_import_users_module
 						{
 							$cp_data['pf_' . $fieldvalue] = $parsed[$userid][$fieldvalue];
 						}
-										
+
 						if ($request->variable('submit', '') == 'Insert')
 						{
 							$user_id = 0;
@@ -148,7 +148,7 @@ class export_import_users_module
 								'user_options'		=> 230271,
 								// We do not set the new flag here - registration scripts need to specify it
 								'user_new'			=> 0,
-						
+
 								'user_inactive_reason'	=> 0,
 								'user_inactive_time'	=> 0,
 								'user_lastmark'			=> time(),
@@ -167,7 +167,7 @@ class export_import_users_module
 								'user_message_rules'	=> 0,
 								'user_full_folder'		=> PRIVMSGS_NO_BOX,
 								'user_emailtime'		=> 0,
-						
+
 								'user_notify'			=> 0,
 								'user_notify_pm'		=> 1,
 								'user_notify_type'		=> NOTIFY_EMAIL,
@@ -175,19 +175,19 @@ class export_import_users_module
 								'user_allow_viewonline'	=> 1,
 								'user_allow_viewemail'	=> 1,
 								'user_allow_massemail'	=> 1,
-						
+
 								'user_sig'					=> '',
 								'user_sig_bbcode_uid'		=> '',
 								'user_sig_bbcode_bitfield'	=> '',
-						
+
 								'user_form_salt'			=> unique_id(),
 							);
 
-							$db->sql_return_on_error(true);
+						//	$db->sql_return_on_error(true);
 							$sql = 'INSERT INTO ' . USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_aray);
 							$db->sql_query($sql);
 							$user_id = $db->sql_nextid();
-							$db->sql_return_on_error(false);
+						//	$db->sql_return_on_error(false);
 
 							if ($user_id )
 							{
@@ -195,27 +195,27 @@ class export_import_users_module
 								$cp_data['user_id'] = (int) $user_id;
 								$sql = 'INSERT INTO ' . PROFILE_FIELDS_DATA_TABLE . ' ' . $db->sql_build_array('INSERT', $cp->build_insert_sql_array($cp_data));
 								$db->sql_query($sql);
-								
+
 								// Place into appropriate group...
 								$sql = 'SELECT group_id FROM ' . GROUPS_TABLE . ' WHERE group_name = "REGISTERED" AND group_type = ' . GROUP_SPECIAL;
 								$result = $db->sql_query($sql);
 								$group_id = $db->sql_fetchfield('group_id');
 								$db->sql_freeresult($result);
-	
+
 								$sql = 'INSERT INTO ' . USER_GROUP_TABLE . ' ' . $db->sql_build_array('INSERT', array(
 									'user_id'		=> (int) $user_id,
 									'group_id'		=> (int) $group_id,
 									'user_pending'	=> 0)
 								);
 								$db->sql_query($sql);
-							
+
 								// Now make it the users default group...
 								if (!function_exists('group_set_user_default'))
 								{
 									include_once($phpbb_root_path . 'includes/functions_user.' . $phpEx);
 								}
 								group_set_user_default($group_id, array($user_id), false);
-	
+
 								$updated[] = '<a href="/adm/index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
 								unset($parsed[$userid]);										
 								set_config('newest_user_id', $user_id, true);
@@ -228,7 +228,7 @@ class export_import_users_module
 							$sql = 'SELECT user_id FROM ' . USERS_TABLE . ' WHERE user_id = ' . (int) $userid;
 							$result = $db->sql_query($sql);
 							$user_id = (int) $db->sql_fetchfield('user_id');
-				
+
 							$db->sql_query('UPDATE ' . USERS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_aray) . ' WHERE user_id = ' . $user_id);
 							$cp = $phpbb_container->get('profilefields.manager');
 							$profile_fields = $cp->update_profile_field_data($user_id, $cp_data);
@@ -247,17 +247,17 @@ class export_import_users_module
 						}
 						add_log('admin', 'LOG_USER_ERROR', implode(', ', $notupdated));
 					}
-					@rename($filename, $phpbb_root_path . 'store/user_updates/'. ((sizeof($updated)) ? 'user' : 'nouser' ). '_update ' . date('d-m-Y H i s', time()) . '.xml');
+				//	@rename($filename, $phpbb_root_path . 'store/user_updates/'. ((sizeof($updated)) ? 'user' : 'nouser' ). '_update ' . date('d-m-Y H i s', time()) . '.xml');
 				}
 			break;
-			
+
 			case 'add_file':
 				if ($submit)
 				{
 					@move_uploaded_file($_FILES['uploadfile']['tmp_name'], $phpbb_root_path . 'store/update_users.xml');
 				}
 			break;
-			
+
 			case 'export':
 				$sql = 'SELECT user_id, user_ip, user_regdate, username, user_password, user_email, user_birthday FROM ' . USERS_TABLE . ' WHERE user_type <> 2 ORDER BY user_id';
 				$result = $db->sql_query($sql);
@@ -282,14 +282,14 @@ class export_import_users_module
 					$xml .= "\t</user>\n\n";   
 				} 
 				$xml .= "</USERS>"; 
-				
+
 				header('Content-type: text/xml');
 				header('Content-Disposition: attachment; filename="export_users.xml"');
 				echo $xml; 
 				exit;
 			break;
 		}
-		
+
 		$error = array();
 		$maxusertoupdate = 200;
 		$parsed_array = (file_exists($filename)) ? readDatabase($filename) : array();
@@ -301,28 +301,28 @@ class export_import_users_module
 				'ERROR'		=> sizeof($updated) . ' users updated',
 				'BOX'		=> 'successbox'
 			));	
-		} elseif (sizeof($parsed))
+		} else if (sizeof($parsed))
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
 				'ERROR'		=> 'Not all users are imported / updated',
 				'BOX'		=> 'errorbox'
 			));	
-		} elseif (!sizeof($updated && sizeof($error)))
+		} else if (!sizeof($updated && sizeof($error)))
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
 				'ERROR'		=> implode('<br />» ', $error),
 				'BOX'		=> 'errorbox'
 			));	
-		}  elseif (sizeof($parsed_array) > $maxusertoupdate)
+		}  else if (sizeof($parsed_array) > $maxusertoupdate)
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
 				'ERROR'		=> '<br />» More then ' . $maxusertoupdate . ' user\'s to update!',
 				'BOX'		=> 'errorbox'
 			));	
-		} elseif (!file_exists($filename))
+		} else if (!file_exists($filename))
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
@@ -339,9 +339,9 @@ class export_import_users_module
 				$pass = ((strlen($value['user_password']) == 34 && (substr($value['user_password'], 0,3) == '$H$' || 
 						substr($value['user_password'], 0,3) == '$P$')) || (strlen($value['user_password']) == 60 && 
 						(substr($value['user_password'], 0,3) == '$2y')))  ? ' Password ok' : 'Password not ok';
-				$sql = 'SELECT user_id, username, user_password, user_email FROM ' . USERS_TABLE . ' 
+				$sql = 'SELECT user_id, username, user_password, user_email FROM ' . USERS_TABLE . '
 						WHERE user_id = ' . $value['user_id'] . ' OR (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';
-				
+
 				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
 				$disabledinsert = $disableupdate = true;
@@ -353,8 +353,7 @@ class export_import_users_module
 						'NEWNAME' 	=> $value['username'],
 						'NEWEMAIL'	=> $value['user_email'],
 						'NEWCITY' 	=> $value['user_from'],
-						'TOOLTIP'	=> 'Username: ' . htmlspecialchars($value['username']) . "\n" . 'Password: ' . $pass . "\n" . 'Emailaddress: ' . htmlspecialchars($value['user_email']) . "\n" .
-										(sizeof($disabled) ? 'Errors:' . implode("\n",  $disabled) : ''),
+						'TOOLTIP'	=> 'Username: ' . htmlspecialchars($value['username']) . "\n" . 'Password: ' . $pass . "\n" . 'Emailaddress: ' . htmlspecialchars($value['user_email']) . "\n" .	(sizeof($disabled) ? 'Errors:' . implode("\n",  $disabled) : ''),
 						'VALIDATED'	=> (!sizeof($disabled)) ? '&radic;' : '<a style="color:red;" href="'.$this->u_action . '&amp;action=delete&amp;id='.$value['user_id'].'">Delete</a>'
 					));
 					$disabledinsert = $disabledinsert & !sizeof($disabled);
@@ -373,19 +372,17 @@ class export_import_users_module
 						'NEWEMAIL'	=> $value['user_email'],
 						'CITY' 		=> isset($profile_fields[$row['user_id']]['phpbb_location']['value']) ? $profile_fields[$row['user_id']]['phpbb_location']['value'] : '',
 						'NEWCITY' 	=> isset($value['phpbb_location']) ? $value['phpbb_location'] : '',
-						'TOOLTIP'	=> 'Username: ' . htmlspecialchars($value['username']) . "\n" . 'Password: ' . $pass . "\n" . 'Emailaddress: ' . htmlspecialchars($value['user_email']) . "\n" .
-										(sizeof($disabled) ? 'Errors:' . implode("\n",  $disabled) : ''),
+						'TOOLTIP'	=> 'Username: ' . htmlspecialchars($value['username']) . "\n" . 'Password: ' . $pass . "\n" . 'Emailaddress: ' . htmlspecialchars($value['user_email']) . "\n" . (sizeof($disabled) ? 'Errors:' . implode("\n",  $disabled) : ''),
 						'VALIDATED'	=> (!sizeof($disabled)) ? '&radic;' : '<a style="color:red;" href="'.$this->u_action . '&amp;action=delete&amp;id='.$value['user_id'].'">Delete</a>'
 					));
 					$disableupdate = $disableupdate & !sizeof($disabled);
 				}
 			}
 			$template->assign_vars(array('DISABLEINSERT' => ($disabledinsert) ? '' : ' disabled="disabled"',
-										 'DISABLEUPDATE' => ($disableupdate) ?  '' : 'disabled="disabled"',
-										 'MAXEXISTINGUSERS' => $maxusertoupdate));
+										'DISABLEUPDATE' => ($disableupdate) ?  '' : 'disabled="disabled"',
+										'MAXEXISTINGUSERS' => $maxusertoupdate));
 		}
 
 	$template->assign_vars(array('EXPORTURL' => $this->u_action . '&amp;action=export'));
 	}
 }
-?>
