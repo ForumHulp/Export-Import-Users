@@ -7,7 +7,7 @@
 *
 */
 
-class export_import_users_update
+class function_export_import_users_update
 {
 	protected $user_id;
 	protected $username;

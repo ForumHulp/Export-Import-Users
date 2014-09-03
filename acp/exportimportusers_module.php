@@ -17,7 +17,7 @@ class exportimportusers_module
 	{
 		global $config, $db, $user, $auth, $template, $cache;
 		global $phpbb_root_path, $phpbb_admin_path, $phpEx, $phpbb_container, $disabled, $request;
-		include('functions_export_import_users.' . $phpEx);
+		include($phpbb_root_path . 'ext/forumhulp/exportimportusers/vendor/functions_export_import_users.' . $phpEx);
 
 		$submit	= (isset($_POST['submit'])) ? true : false;
 		$action	= $request->variable('action', '');
