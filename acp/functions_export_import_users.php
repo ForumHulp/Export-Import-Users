@@ -16,13 +16,16 @@ class export_import_users_update {
 	var $user_occ;
 	var $user_password;
 
-	function export_import_users_update ($aa) 
+	function export_import_users_update($aa)
 	{
-		foreach ($aa as $k => $v) $this->$k = $aa[$k];
+		foreach ($aa as $k => $v)
+		{
+			$this->$k = $aa[$k];
+		}
 	}
 }
 
-function readDatabase($filename) 
+function readDatabase($filename)
 {
 	// read the XML database of asaf_updates
 	$data = implode('', file($filename));
@@ -33,17 +36,17 @@ function readDatabase($filename)
 	xml_parser_free($parser);
 
 	// loop through the structures
-	foreach ($tags as $key => $val) 
+	foreach ($tags as $key => $val)
 	{
 		if ($key == "user")
 		{
-			for ($i = 0; $i < count($val); $i+= 2) 
+			for ($i = 0; $i < count($val); $i+= 2)
 			{
 				$offset = $val[$i] + 1;
 				$len = $val[$i + 1] - $offset;
 				$tdb[] = parse_user(array_slice($values, $offset, $len));
 			}
-		} else 
+		} else
 		{
 			continue;
 		}
@@ -51,9 +54,9 @@ function readDatabase($filename)
 	return $tdb;
 }
 
-function parse_user($mvalues) 
+function parse_user($mvalues)
 {
-	for ($i = 0; $i < count($mvalues); $i++) 
+	for ($i = 0; $i < count($mvalues); $i++)
 	{
 		$user_values[$mvalues[$i]['tag']] = (isset($mvalues[$i]['value'])) ? $mvalues[$i]['value'] : '';
 	}
@@ -71,22 +74,22 @@ function validate_import($importname = '', $newpassword = '', $newemail = '', $c
 	$user->add_lang(array('ucp'));
 	$error = array();
 	$err = validate_string($importname, false, $config['min_name_chars'], $config['max_name_chars']);
-	($err) ? $error[] = $user->lang[$err] : NULL;
+	($err) ? $error[] = $user->lang[$err] : null;
 	$err = validate_username($importname, 'allowed name');
-	($checkdbname && $err == 'USERNAME_TAKEN') ? $error[] = $user->lang[$err . '_USERNAME'] : NULL;
-	($err && $err != 'USERNAME_TAKEN') ? $error[] = $user->lang[$err . '_USERNAME'] : NULL;
+	($checkdbname && $err == 'USERNAME_TAKEN') ? $error[] = $user->lang[$err . '_USERNAME'] : null;
+	($err && $err != 'USERNAME_TAKEN') ? $error[] = $user->lang[$err . '_USERNAME'] : null;
 	$err = filter_var($newemail, FILTER_VALIDATE_EMAIL);
-	(!$err) ? $error[] = $user->lang['NO_EMAILS_DEFINED'] : NULL;
+	(!$err) ? $error[] = $user->lang['NO_EMAILS_DEFINED'] : null;
 	if (strlen($newpassword) == 60 || strlen($newpassword) == 34)
 	{
 		if ((strlen($newpassword) == 34 && (substr($newpassword, 0,3) == '$H$' || substr($newpassword, 0,3) == '$P$')) || (strlen($newpassword) == 60 && (substr($newpassword, 0,3) == '$2y')))
 		{
 			$err = false;
 		}
-	} else 
+	} else
 	{
 		$err = $user->lang['WRONG_PASSWORD'];
 	}
-	($err) ? $error[] = $err : NULL;
+	($err) ? $error[] = $err : null;
 	return $error;
 }

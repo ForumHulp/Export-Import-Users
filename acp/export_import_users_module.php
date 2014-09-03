@@ -29,7 +29,7 @@ class exportimport_users_module
 		$result = $db->sql_query($sql);
 		while ($row = $db->sql_fetchrow($result))
 		{
-			$profilearay[] = $row['field_name'];	
+			$profilearay[] = $row['field_name'];
 		}
 
 		$filename = $phpbb_root_path . 'store/update_users.xml';
@@ -41,36 +41,36 @@ class exportimport_users_module
 				$parsed_array = readDatabase($filename);
 				if (sizeof($parsed_array))
 				{
-					$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<USERS>\n\n"; 
+					$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<USERS>\n\n";
 					foreach ($parsed_array as $key => $value)
-					{	
+					{
 						$value = get_object_vars($value);
 						if (request_var('id', 0) == $value['user_id'])
 						{
 							unset($parsed_array[$key]);
 						} else
 						{
-							$xml .= "\t<user>\n"; 
-							$xml .= "\t\t<user_id>".$value['user_id']."</user_id>\n";   
-							$xml .= "\t\t<user_ip>".$value['user_ip']."</user_ip>\n";   
-							$xml .= "\t\t<user_regdate>".$value['user_regdate']."</user_regdate>\n";   
-							$xml .= "\t\t<username>".$value['username']."</username>\n"; 
-							$xml .= "\t\t<user_email>".$value['user_email']."</user_email>\n";   
-							$xml .= "\t\t<user_birthday>".$value['user_birthday']."</user_birthday>\n"; 
+							$xml .= "\t<user>\n";
+							$xml .= "\t\t<user_id>".$value['user_id']."</user_id>\n";
+							$xml .= "\t\t<user_ip>".$value['user_ip']."</user_ip>\n";
+							$xml .= "\t\t<user_regdate>".$value['user_regdate']."</user_regdate>\n";
+							$xml .= "\t\t<username>".$value['username']."</username>\n";
+							$xml .= "\t\t<user_email>".$value['user_email']."</user_email>\n";
+							$xml .= "\t\t<user_birthday>".$value['user_birthday']."</user_birthday>\n";
 
 							foreach($profilearay as $id => $fieldvalue)
 							{
-								$xml .= "\t\t<".$fieldvalue.">".isset($value[$fieldvalue]) ? $value[$fieldvalue] : ''."</".$fieldvalue.">\n";     
+								$xml .= "\t\t<".$fieldvalue.">".isset($value[$fieldvalue]) ? $value[$fieldvalue] : ''."</".$fieldvalue.">\n";
 							}
 
-							$xml .= "\t\t<user_from>".$profile_fields[$value['user_id']]['phpbb_location']['value']."</user_from>\n";     
-							$xml .= "\t\t<user_website>".$profile_fields[$value['user_id']]['phpbb_website']['value']."</user_website>\n";     
-							$xml .= "\t\t<user_occ>".$profile_fields[$value['user_id']]['phpbb_occupation']['value']."</user_occ>\n";     
-							$xml .= "\t\t<user_password>".$value['user_password']."</user_password>\n";     
-							$xml .= "\t</user>\n\n";   
+							$xml .= "\t\t<user_from>".$profile_fields[$value['user_id']]['phpbb_location']['value']."</user_from>\n";
+							$xml .= "\t\t<user_website>".$profile_fields[$value['user_id']]['phpbb_website']['value']."</user_website>\n";
+							$xml .= "\t\t<user_occ>".$profile_fields[$value['user_id']]['phpbb_occupation']['value']."</user_occ>\n";
+							$xml .= "\t\t<user_password>".$value['user_password']."</user_password>\n";
+							$xml .= "\t</user>\n\n";
 						}
 					}
-					$xml .= "</USERS>"; 
+					$xml .= "</USERS>";
 					file_put_contents($filename, $xml);
 				}
 			break;
@@ -97,7 +97,7 @@ class exportimport_users_module
 							} else
 							{
 								$sql = 'SELECT user_id, username, user_email FROM ' . USERS_TABLE . '
-										WHERE (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';				
+										WHERE (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';
 								$result = $db->sql_query($sql);
 								$row = $db->sql_fetchrow($result);
 								$parsed[$row['user_id']] = array(
@@ -111,7 +111,7 @@ class exportimport_users_module
 							$cp_data = array();
 							foreach($profilearay as $id => $fieldvalue)
 							{
-								$parsed[$value['user_id']] += array($fieldvalue => utf8_normalize_nfc($value[$fieldvalue]));  
+								$parsed[$value['user_id']] += array($fieldvalue => utf8_normalize_nfc($value[$fieldvalue]));
 							}
 						}
 					}
@@ -217,7 +217,7 @@ class exportimport_users_module
 								group_set_user_default($group_id, array($user_id), false);
 
 								$updated[] = '<a href="/adm/index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
-								unset($parsed[$userid]);										
+								unset($parsed[$userid]);
 								set_config('newest_user_id', $user_id, true);
 								set_config('newest_username', $sql_aray['username'], true);
 								set_config_count('num_users', 1, true);
@@ -233,11 +233,14 @@ class exportimport_users_module
 							$cp = $phpbb_container->get('profilefields.manager');
 							$profile_fields = $cp->update_profile_field_data($user_id, $cp_data);
 
-							$updated[] = '<a href="/adm/index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';											
+							$updated[] = '<a href="/adm/index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
 							unset($parsed[$userid]);
 						}
 					}
-					if (sizeof($updated)) add_log('admin', 'LOG_USER_CHANGE', implode(', ', $updated));
+					if (sizeof($updated))
+					{
+						add_log('admin', 'LOG_USER_CHANGE', implode(', ', $updated));
+					}
 
 					if (sizeof($parsed))
 					{
@@ -261,31 +264,31 @@ class exportimport_users_module
 			case 'export':
 				$sql = 'SELECT user_id, user_ip, user_regdate, username, user_password, user_email, user_birthday FROM ' . USERS_TABLE . ' WHERE user_type <> 2 ORDER BY user_id';
 				$result = $db->sql_query($sql);
-				$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<USERS>\n\n"; 
+				$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<USERS>\n\n";
 				while ($row = $db->sql_fetchrow($result))
 				{
 					$cp = $phpbb_container->get('profilefields.manager');
 					$profile_fields = $cp->grab_profile_fields_data($row['user_id']);
 
-					$xml .= "\t<user>\n"; 
-					$xml .= "\t\t<user_id>".$row['user_id']."</user_id>\n";   
-					$xml .= "\t\t<user_ip>".$row['user_ip']."</user_ip>\n";   
-					$xml .= "\t\t<user_regdate>".$row['user_regdate']."</user_regdate>\n";   
-					$xml .= "\t\t<username>".$row['username']."</username>\n"; 
-					$xml .= "\t\t<user_email>".$row['user_email']."</user_email>\n";   
-					$xml .= "\t\t<user_birthday>".$row['user_birthday']."</user_birthday>\n"; 
+					$xml .= "\t<user>\n";
+					$xml .= "\t\t<user_id>".$row['user_id']."</user_id>\n";
+					$xml .= "\t\t<user_ip>".$row['user_ip']."</user_ip>\n";
+					$xml .= "\t\t<user_regdate>".$row['user_regdate']."</user_regdate>\n";
+					$xml .= "\t\t<username>".$row['username']."</username>\n";
+					$xml .= "\t\t<user_email>".$row['user_email']."</user_email>\n";
+					$xml .= "\t\t<user_birthday>".$row['user_birthday']."</user_birthday>\n";
 					foreach($profilearay as $id => $fieldvalue)
 					{
-						$xml .= "\t\t<".$fieldvalue.">".$profile_fields[$row['user_id']][$fieldvalue]['value']."</".$fieldvalue.">\n";     
+						$xml .= "\t\t<".$fieldvalue.">".$profile_fields[$row['user_id']][$fieldvalue]['value']."</".$fieldvalue.">\n";
 					}
-					$xml .= "\t\t<user_password>".$row['user_password']."</user_password>\n";     
-					$xml .= "\t</user>\n\n";   
+					$xml .= "\t\t<user_password>".$row['user_password']."</user_password>\n";
+					$xml .= "\t</user>\n\n";
 				} 
-				$xml .= "</USERS>"; 
+				$xml .= "</USERS>";
 
 				header('Content-type: text/xml');
 				header('Content-Disposition: attachment; filename="export_users.xml"');
-				echo $xml; 
+				echo $xml;
 				exit;
 			break;
 		}
@@ -300,35 +303,35 @@ class exportimport_users_module
 				'S_ERROR'	=> true,
 				'ERROR'		=> sizeof($updated) . ' users updated',
 				'BOX'		=> 'successbox'
-			));	
+			));
 		} else if (sizeof($parsed))
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
 				'ERROR'		=> 'Not all users are imported / updated',
 				'BOX'		=> 'errorbox'
-			));	
+			));
 		} else if (!sizeof($updated && sizeof($error)))
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
 				'ERROR'		=> implode('<br />» ', $error),
 				'BOX'		=> 'errorbox'
-			));	
+			));
 		}  else if (sizeof($parsed_array) > $maxusertoupdate)
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
 				'ERROR'		=> '<br />» More then ' . $maxusertoupdate . ' user\'s to update!',
 				'BOX'		=> 'errorbox'
-			));	
+			));
 		} else if (!file_exists($filename))
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
 				'ERROR'		=> 'File "update_users.xml" doesn\'t excists!',
 				'BOX'		=> 'errorbox'
-			));	
+			));
 			$parsed_array = array();
 		}
 		if (sizeof($parsed_array))
@@ -336,8 +339,8 @@ class exportimport_users_module
 			foreach ($parsed_array as $key => $value)
 			{
 				$value = get_object_vars($value);
-				$pass = ((strlen($value['user_password']) == 34 && (substr($value['user_password'], 0,3) == '$H$' || 
-						substr($value['user_password'], 0,3) == '$P$')) || (strlen($value['user_password']) == 60 && 
+				$pass = ((strlen($value['user_password']) == 34 && (substr($value['user_password'], 0,3) == '$H$' ||
+						substr($value['user_password'], 0,3) == '$P$')) || (strlen($value['user_password']) == 60 &&
 						(substr($value['user_password'], 0,3) == '$2y')))  ? ' Password ok' : 'Password not ok';
 				$sql = 'SELECT user_id, username, user_password, user_email FROM ' . USERS_TABLE . '
 						WHERE user_id = ' . $value['user_id'] . ' OR (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';

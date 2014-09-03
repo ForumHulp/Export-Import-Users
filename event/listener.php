@@ -52,7 +52,7 @@ class listener implements EventSubscriberInterface
 			}
 		}
 		$event['row'] = $additional_data;
-   }
+	}
 
 	public function load_language_on_setup($event)
 	{
