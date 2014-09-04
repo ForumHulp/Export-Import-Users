@@ -82,7 +82,7 @@ class exportimportusers_module
 
 			$this->tpl_name = 'acp_ext_details';
 			break;
-	
+
 			case 'delete':
 				$parsed_array = readDatabase($filename);
 				if (sizeof($parsed_array))
@@ -103,12 +103,12 @@ class exportimportusers_module
 							$xml .= "\t\t<username>".$value['username']."</username>\n";
 							$xml .= "\t\t<user_email>".$value['user_email']."</user_email>\n";
 							$xml .= "\t\t<user_birthday>".$value['user_birthday']."</user_birthday>\n";
-	
+
 							foreach($profilearay as $id => $fieldvalue)
 							{
 								$xml .= "\t\t<".$fieldvalue.">".isset($value[$fieldvalue]) ? $value[$fieldvalue] : ''."</".$fieldvalue.">\n";
 							}
-	
+
 							$xml .= "\t\t<user_from>".$profile_fields[$value['user_id']]['phpbb_location']['value']."</user_from>\n";
 							$xml .= "\t\t<user_website>".$profile_fields[$value['user_id']]['phpbb_website']['value']."</user_website>\n";
 							$xml .= "\t\t<user_occ>".$profile_fields[$value['user_id']]['phpbb_occupation']['value']."</user_occ>\n";
@@ -120,7 +120,7 @@ class exportimportusers_module
 					file_put_contents($filename, $xml);
 				}
 			break;
-	
+
 			case 'save':
 				if ($submit && sizeof($user_ids))
 				{
@@ -172,13 +172,13 @@ class exportimportusers_module
 									'user_email_hash'	=> phpbb_email_hash($parsed[$userid]['user_email']),
 									'user_password' 	=> $parsed[$userid]['user_password'],
 									'user_birthday'		=> $parsed[$userid]['user_birthday']);
-	
+
 						$cp_data = array();
 						foreach($profilearay as $id => $fieldvalue)
 						{
 							$cp_data['pf_' . $fieldvalue] = $parsed[$userid][$fieldvalue];
 						}
-	
+
 						if ($request->variable('submit', '') == 'Insert')
 						{
 							$user_id = 0;
@@ -193,7 +193,7 @@ class exportimportusers_module
 								'user_options'		=> 230271,
 								// We do not set the new flag here - registration scripts need to specify it
 								'user_new'			=> 0,
-	
+
 								'user_inactive_reason'	=> 0,
 								'user_inactive_time'	=> 0,
 								'user_lastmark'			=> time(),
@@ -212,7 +212,7 @@ class exportimportusers_module
 								'user_message_rules'	=> 0,
 								'user_full_folder'		=> PRIVMSGS_NO_BOX,
 								'user_emailtime'		=> 0,
-	
+
 								'user_notify'			=> 0,
 								'user_notify_pm'		=> 1,
 								'user_notify_type'		=> NOTIFY_EMAIL,
@@ -220,64 +220,64 @@ class exportimportusers_module
 								'user_allow_viewonline'	=> 1,
 								'user_allow_viewemail'	=> 1,
 								'user_allow_massemail'	=> 1,
-	
+
 								'user_sig'					=> '',
 								'user_sig_bbcode_uid'		=> '',
 								'user_sig_bbcode_bitfield'	=> '',
-	
+
 								'user_form_salt'			=> unique_id(),
 							);
-	
+
 						//	$db->sql_return_on_error(true);
 							$sql = 'INSERT INTO ' . USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_aray);
 							$db->sql_query($sql);
 							$user_id = $db->sql_nextid();
 						//	$db->sql_return_on_error(false);
-	
+
 							if ($user_id )
 							{
 								$cp = $phpbb_container->get('profilefields.manager');
 								$cp_data['user_id'] = (int) $user_id;
 								$sql = 'INSERT INTO ' . PROFILE_FIELDS_DATA_TABLE . ' ' . $db->sql_build_array('INSERT', $cp->build_insert_sql_array($cp_data));
 								$db->sql_query($sql);
-	
+
 								// Place into appropriate group...
 								$sql = 'SELECT group_id FROM ' . GROUPS_TABLE . ' WHERE group_name = "REGISTERED" AND group_type = ' . GROUP_SPECIAL;
 								$result = $db->sql_query($sql);
 								$group_id = $db->sql_fetchfield('group_id');
 								$db->sql_freeresult($result);
-	
+
 								$sql = 'INSERT INTO ' . USER_GROUP_TABLE . ' ' . $db->sql_build_array('INSERT', array(
 									'user_id'		=> (int) $user_id,
 									'group_id'		=> (int) $group_id,
 									'user_pending'	=> 0)
 								);
 								$db->sql_query($sql);
-	
+
 								// Now make it the users default group...
 								if (!function_exists('group_set_user_default'))
 								{
 									include_once($phpbb_root_path . 'includes/functions_user.' . $phpEx);
 								}
 								group_set_user_default($group_id, array($user_id), false);
-	
+
 								$updated[] = '<a href="/adm/index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
 								unset($parsed[$userid]);
 								set_config('newest_user_id', $user_id, true);
 								set_config('newest_username', $sql_aray['username'], true);
 								set_config_count('num_users', 1, true);
 							}
-	
+
 						} else
 						{
 							$sql = 'SELECT user_id FROM ' . USERS_TABLE . ' WHERE user_id = ' . (int) $userid;
 							$result = $db->sql_query($sql);
 							$user_id = (int) $db->sql_fetchfield('user_id');
-	
+
 							$db->sql_query('UPDATE ' . USERS_TABLE . ' SET ' . $db->sql_build_array('UPDATE', $sql_aray) . ' WHERE user_id = ' . $user_id);
 							$cp = $phpbb_container->get('profilefields.manager');
 							$profile_fields = $cp->update_profile_field_data($user_id, $cp_data);
-	
+
 							$updated[] = '<a href="/adm/index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
 							unset($parsed[$userid]);
 						}
@@ -286,7 +286,7 @@ class exportimportusers_module
 					{
 						add_log('admin', 'LOG_USER_CHANGE', implode(', ', $updated));
 					}
-	
+
 					if (sizeof($parsed))
 					{
 						foreach ($parsed as $user_id => $value)
@@ -298,14 +298,14 @@ class exportimportusers_module
 					@rename($filename, $phpbb_root_path . 'store/user_updates/'. ((sizeof($updated)) ? 'user' : 'nouser' ). '_update ' . date('d-m-Y H i s', time()) . '.xml');
 				}
 			break;
-	
+
 			case 'add_file':
 				if ($submit)
 				{
 					@move_uploaded_file($_FILES['uploadfile']['tmp_name'], $phpbb_root_path . 'store/update_users.xml');
 				}
 			break;
-	
+
 			case 'export':
 				$sql = 'SELECT user_id, user_ip, user_regdate, username, user_password, user_email, user_birthday FROM ' . USERS_TABLE . ' WHERE user_type <> 2 ORDER BY user_id';
 				$result = $db->sql_query($sql);
@@ -314,7 +314,7 @@ class exportimportusers_module
 				{
 					$cp = $phpbb_container->get('profilefields.manager');
 					$profile_fields = $cp->grab_profile_fields_data($row['user_id']);
-	
+
 					$xml .= "\t<user>\n";
 					$xml .= "\t\t<user_id>".$row['user_id']."</user_id>\n";
 					$xml .= "\t\t<user_ip>".$row['user_ip']."</user_ip>\n";
@@ -330,7 +330,7 @@ class exportimportusers_module
 					$xml .= "\t</user>\n\n";
 				}
 				$xml .= "</USERS>";
-	
+
 				header('Content-type: text/xml');
 				header('Content-Disposition: attachment; filename="export_users.xml"');
 				echo $xml;
@@ -432,7 +432,7 @@ class exportimportusers_module
 
 	$template->assign_vars(array('U_ACTION' =>  $this->u_action, 'EXPORTURL' => $this->u_action . '&amp;action=export'));
 	}
-	
+
 	/**
 	* Check the version and return the available updates.
 	*
