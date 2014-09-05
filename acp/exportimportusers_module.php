@@ -90,7 +90,6 @@ class exportimportusers_module
 					$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<USERS>\n\n";
 					foreach ($parsed_array as $key => $value)
 					{
-						$value = get_object_vars($value);
 						if (request_var('id', 0) == $value['user_id'])
 						{
 							unset($parsed_array[$key]);
@@ -106,12 +105,8 @@ class exportimportusers_module
 
 							foreach($profilearay as $id => $fieldvalue)
 							{
-								$xml .= "\t\t<".$fieldvalue.">".isset($value[$fieldvalue]) ? $value[$fieldvalue] : ''."</".$fieldvalue.">\n";
+								$xml .= "\t\t<".$fieldvalue.">".(isset($value[$fieldvalue]) ? $value[$fieldvalue] : '')."</".$fieldvalue.">\n";
 							}
-
-							$xml .= "\t\t<user_from>".$profile_fields[$value['user_id']]['phpbb_location']['value']."</user_from>\n";
-							$xml .= "\t\t<user_website>".$profile_fields[$value['user_id']]['phpbb_website']['value']."</user_website>\n";
-							$xml .= "\t\t<user_occ>".$profile_fields[$value['user_id']]['phpbb_occupation']['value']."</user_occ>\n";
 							$xml .= "\t\t<user_password>".$value['user_password']."</user_password>\n";
 							$xml .= "\t</user>\n\n";
 						}
@@ -152,11 +147,15 @@ class exportimportusers_module
 									'user_password'	=> $value['user_password'],
 									'user_birthday'	=> $value['user_birthday'],
 									'user_email'	=> $value['user_email']);
+								$value['user_id'] = $row['user_id'];
 							}
 							$cp_data = array();
 							foreach($profilearay as $id => $fieldvalue)
 							{
-								$parsed[$value['user_id']] += array($fieldvalue => utf8_normalize_nfc($value[$fieldvalue]));
+								if (isset($value[$fieldvalue]))
+								{
+									$parsed[$value['user_id']] += array($fieldvalue => utf8_normalize_nfc($value[$fieldvalue]));
+								}
 							}
 						}
 					}
@@ -176,7 +175,10 @@ class exportimportusers_module
 						$cp_data = array();
 						foreach($profilearay as $id => $fieldvalue)
 						{
-							$cp_data['pf_' . $fieldvalue] = $parsed[$userid][$fieldvalue];
+							if (isset($parsed[$userid][$fieldvalue]))
+							{
+								$cp_data['pf_' . $fieldvalue] = $parsed[$userid][$fieldvalue];
+							}
 						}
 
 						if ($request->variable('submit', '') == 'Insert')
@@ -324,7 +326,10 @@ class exportimportusers_module
 					$xml .= "\t\t<user_birthday>".$row['user_birthday']."</user_birthday>\n";
 					foreach($profilearay as $id => $fieldvalue)
 					{
-						$xml .= "\t\t<".$fieldvalue.">".$profile_fields[$row['user_id']][$fieldvalue]['value']."</".$fieldvalue.">\n";
+						if (isset($profile_fields[$row['user_id']]))
+						{
+							$xml .= "\t\t<".$fieldvalue.">".$profile_fields[$row['user_id']][$fieldvalue]['value']."</".$fieldvalue.">\n";
+						}
 					}
 					$xml .= "\t\t<user_password>".$row['user_password']."</user_password>\n";
 					$xml .= "\t</user>\n\n";
@@ -399,7 +404,7 @@ class exportimportusers_module
 						'NEWID'		=> $value['user_id'],
 						'NEWNAME' 	=> $value['username'],
 						'NEWEMAIL'	=> $value['user_email'],
-						'NEWCITY' 	=> $value['user_from'],
+						'NEWCITY' 	=> $value['phpbb_location'],
 						'TOOLTIP'	=> 'Username: ' . htmlspecialchars($value['username']) . "\n" . 'Password: ' . $pass . "\n" . 'Emailaddress: ' . htmlspecialchars($value['user_email']) . "\n" .	(sizeof($disabled) ? 'Errors:' . implode("\n",  $disabled) : ''),
 						'VALIDATED'	=> (!sizeof($disabled)) ? '&radic;' : '<a style="color:red;" href="'.$this->u_action . '&amp;action=delete&amp;id='.$value['user_id'].'">Delete</a>'
 					));

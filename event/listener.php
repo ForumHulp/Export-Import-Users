@@ -46,7 +46,7 @@ class listener implements EventSubscriberInterface
 		$additional_data = $event['row'];
 		foreach($additional_data as $key => $value)
 		{
-			if ($key == 'log_data')
+			if ($key == 'log_data' && $value != '')
 			{
 				$additional_data['log_data'] = serialize(str_replace('{_SID}', $_SID, unserialize($value)));
 			}
