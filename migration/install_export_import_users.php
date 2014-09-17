@@ -7,13 +7,13 @@
 *
 */
 
-namespace forumhulp\exportimportusers\migrations;
+namespace forumhulp\exportimportusers\migration;
 
 class install_export_import_users extends \phpbb\db\migration\migration
 {
 	public function effectively_installed()
 	{
-		return isset($this->config['export_import_users_version']) && version_compare($this->config['export_import_users_version'], '3.1.0', '>=');
+		return isset($this->config['export_import_users_version']) && version_compare($this->config['export_import_users_version'], '3.1.0.RC4', '>=');
 	}
 
 	static public function depends_on()
@@ -29,7 +29,7 @@ class install_export_import_users extends \phpbb\db\migration\migration
 					'module_langname'	=> 'ACP_EXPORT_IMPORT_USERS',
 					'module_mode'		=> 'index',
 			))),
-			array('config.add', array('export_import_users_version', '3.1.0')),
+			array('config.add', array('export_import_users_version', '3.1.0.RC4')),
 		);
 	}
 }
