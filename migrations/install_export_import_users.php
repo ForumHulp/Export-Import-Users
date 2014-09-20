@@ -7,7 +7,7 @@
 *
 */
 
-namespace forumhulp\exportimportusers\migration;
+namespace forumhulp\exportimportusers\migrations;
 
 class install_export_import_users extends \phpbb\db\migration\migration
 {
