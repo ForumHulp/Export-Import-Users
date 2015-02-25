@@ -297,6 +297,11 @@ class exportimportusers_module
 						}
 						add_log('admin', 'LOG_USER_ERROR', implode(', ', $notupdated));
 					}
+					if (!file_exists($phpbb_root_path . 'store/user_updates'))
+					{
+						mkdir($phpbb_root_path . 'store/user_updates', 0755, true);
+					}
+					
 					@rename($filename, $phpbb_root_path . 'store/user_updates/'. ((sizeof($updated)) ? 'user' : 'nouser' ). '_update ' . date('d-m-Y H i s', time()) . '.xml');
 				}
 			break;
@@ -304,7 +309,21 @@ class exportimportusers_module
 			case 'add_file':
 				if ($submit)
 				{
-					@move_uploaded_file($_FILES['uploadfile']['tmp_name'], $phpbb_root_path . 'store/update_users.xml');
+					$user->add_lang('posting');  // For error messages
+					if (!class_exists('\fileupload'))
+					{
+						include($phpbb_root_path . 'includes/functions_upload.' . $phpEx);
+					}
+					$upload = new \fileupload();
+					$upload->set_allowed_extensions(array('xml'));
+			
+					$upload_dir = $phpbb_root_path . 'store';
+					$file = $upload->form_upload('uploadfile');
+					if ($file->filesize)
+					{
+						$file->clean_filename('avatar', '', 'update_users');
+						$file->move_file(str_replace($phpbb_root_path, '', $upload_dir), true, true);
+					}
 				}
 			break;
 
