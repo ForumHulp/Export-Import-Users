@@ -301,8 +301,8 @@ class exportimportusers_module
 					{
 						mkdir($phpbb_root_path . 'store/user_updates', 0755, true);
 					}
-					
-					@rename($filename, $phpbb_root_path . 'store/user_updates/'. ((sizeof($updated)) ? 'user' : 'nouser' ). '_update ' . date('d-m-Y H i s', time()) . '.xml');
+
+					rename($filename, $phpbb_root_path . 'store/user_updates/'. ((sizeof($updated)) ? 'user' : 'nouser' ). '_update ' . date('d-m-Y H i s', time()) . '.xml');
 				}
 			break;
 
@@ -316,7 +316,7 @@ class exportimportusers_module
 					}
 					$upload = new \fileupload();
 					$upload->set_allowed_extensions(array('xml'));
-			
+
 					$upload_dir = $phpbb_root_path . 'store';
 					$file = $upload->form_upload('uploadfile');
 					if ($file->filesize)
