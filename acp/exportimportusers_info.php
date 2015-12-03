@@ -21,7 +21,7 @@ class exportimportusers_info
 			'filename'	=> '\forumhulp\exportimportusers\acp\exportimportusers_module',
 			'title'		=> 'ACP_EXPORT_IMPORT_USERS',
 			'version'	=> '3.1.0',
-			'modes'     => array('index' => array('title' => 'ACP_EXPORT_IMPORT_USERS', 'auth' => 'acl_a_board', 'cat' => array('ACP_CAT_USERS'))
+			'modes'     => array('index' => array('title' => 'ACP_EXPORT_IMPORT_USERS', 'auth' => 'ext_forumhulp/exportimportusers && acl_a_board', 'cat' => array('ACP_CAT_USERS'))
 			),
 		);
 	}

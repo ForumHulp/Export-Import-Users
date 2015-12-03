@@ -16,8 +16,8 @@ class exportimportusers_module
 	function main($id, $mode)
 	{
 		global $config, $db, $user, $auth, $template, $cache;
-		global $phpbb_root_path, $phpbb_admin_path, $phpEx, $phpbb_container,  $phpbb_extension_manager, $disabled, $request;
-		include($phpbb_root_path . 'ext/forumhulp/exportimportusers/vendor/functions_export_import_users.' . $phpEx);
+		global $phpbb_root_path, $phpbb_admin_path, $phpEx, $phpbb_container, $disabled, $request;
+		include($phpbb_root_path . 'ext/forumhulp/exportimportusers/helper/functions_export_import_users.' . $phpEx);
 
 		$submit	= (isset($_POST['submit'])) ? true : false;
 		$action	= $request->variable('action', '');
@@ -38,49 +38,9 @@ class exportimportusers_module
 		switch ($action)
 		{
 			case 'details':
-
-			$user->add_lang(array('install', 'acp/extensions', 'migrator'));
-			$ext_name = 'forumhulp/exportimportusers';
-			$md_manager = new \phpbb\extension\metadata_manager($ext_name, $config, $phpbb_extension_manager, $template, $user, $phpbb_root_path);
-			try
-			{
-				$this->metadata = $md_manager->get_metadata('all');
-			}
-			catch(\phpbb\extension\exception $e)
-			{
-				trigger_error($e, E_USER_WARNING);
-			}
-
-			$md_manager->output_template_data();
-
-			try
-			{
-				$updates_available = $this->version_check($md_manager, $request->variable('versioncheck_force', false));
-
-				$template->assign_vars(array(
-					'S_UP_TO_DATE'		=> empty($updates_available),
-					'S_VERSIONCHECK'	=> true,
-					'UP_TO_DATE_MSG'	=> $user->lang(empty($updates_available) ? 'UP_TO_DATE' : 'NOT_UP_TO_DATE', $md_manager->get_metadata('display-name')),
-				));
-
-				foreach ($updates_available as $branch => $version_data)
-				{
-					$template->assign_block_vars('updates_available', $version_data);
-				}
-			}
-			catch (\RuntimeException $e)
-			{
-				$template->assign_vars(array(
-					'S_VERSIONCHECK_STATUS'			=> $e->getCode(),
-					'VERSIONCHECK_FAIL_REASON'		=> ($e->getMessage() !== $user->lang('VERSIONCHECK_FAIL')) ? $e->getMessage() : '',
-				));
-			}
-
-			$template->assign_vars(array(
-				'U_BACK'				=> $this->u_action . '&amp;action=list',
-			));
-
-			$this->tpl_name = 'acp_ext_details';
+				$user->add_lang_ext('forumhulp/exportimportusers', 'info_acp_exportimportusers');
+				$phpbb_container->get('forumhulp.helper')->detail('forumhulp/exportimportusers');
+				$this->tpl_name = 'acp_ext_details';
 			break;
 
 			case 'delete':
@@ -90,24 +50,16 @@ class exportimportusers_module
 					$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<USERS>\n\n";
 					foreach ($parsed_array as $key => $value)
 					{
-						if (request_var('id', 0) == $value['user_id'])
+						if ($request->variable('id', 0) == $value['user_id'])
 						{
 							unset($parsed_array[$key]);
 						} else
 						{
 							$xml .= "\t<user>\n";
-							$xml .= "\t\t<user_id>".$value['user_id']."</user_id>\n";
-							$xml .= "\t\t<user_ip>".$value['user_ip']."</user_ip>\n";
-							$xml .= "\t\t<user_regdate>".$value['user_regdate']."</user_regdate>\n";
-							$xml .= "\t\t<username>".$value['username']."</username>\n";
-							$xml .= "\t\t<user_email>".$value['user_email']."</user_email>\n";
-							$xml .= "\t\t<user_birthday>".$value['user_birthday']."</user_birthday>\n";
-
-							foreach($profilearay as $id => $fieldvalue)
+							foreach($value as $key2 => $value2)
 							{
-								$xml .= "\t\t<".$fieldvalue.">".(isset($value[$fieldvalue]) ? $value[$fieldvalue] : '')."</".$fieldvalue.">\n";
+								$xml .= "\t\t<".$key2.">".$value2."</".$key2.">\n";		
 							}
-							$xml .= "\t\t<user_password>".$value['user_password']."</user_password>\n";
 							$xml .= "\t</user>\n\n";
 						}
 					}
@@ -263,7 +215,7 @@ class exportimportusers_module
 								}
 								group_set_user_default($group_id, array($user_id), false);
 
-								$updated[] = '<a href="/adm/index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
+								$updated[] = '<a href="' . $phpbb_admin_path . 'index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
 								unset($parsed[$userid]);
 								set_config('newest_user_id', $user_id, true);
 								set_config('newest_username', $sql_aray['username'], true);
@@ -280,7 +232,7 @@ class exportimportusers_module
 							$cp = $phpbb_container->get('profilefields.manager');
 							$profile_fields = $cp->update_profile_field_data($user_id, $cp_data);
 
-							$updated[] = '<a href="/adm/index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
+							$updated[] = '<a href="' . $phpbb_admin_path . 'index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
 							unset($parsed[$userid]);
 						}
 					}
@@ -309,31 +261,41 @@ class exportimportusers_module
 			case 'add_file':
 				if ($submit)
 				{
-					$user->add_lang('posting');  // For error messages
-					if (!class_exists('\fileupload'))
+					if (version_compare($config['version'], '3.2.*', '<'))
 					{
 						include($phpbb_root_path . 'includes/functions_upload.' . $phpEx);
+						$upload = new \fileupload();
+						$upload->set_allowed_extensions(array('xml'));
+					} else
+					{
+						$upload = $phpbb_container->get('files.factory')->get('upload')
+							->set_error_prefix('AVATAR_')
+							->set_allowed_extensions(array('xml'))
+							->set_max_filesize(0)
+							->set_allowed_dimensions(0,0,0,0)
+							->set_disallowed_content((isset($this->config['mime_triggers']) ? explode('|', $this->config['mime_triggers']) : false));
 					}
-					$upload = new \fileupload();
-					$upload->set_allowed_extensions(array('xml'));
+
+					$user->add_lang('posting');
 
 					$upload_dir = $phpbb_root_path . 'store';
-					$file = $upload->form_upload('uploadfile');
-					if ($file->filesize)
+					$file = (version_compare($config['version'], '3.2.*', '<')) ? $upload->form_upload('uploadfile') : $upload->handle_upload('files.types.form', 'uploadfile');
+					if ($file->get('filesize'))
 					{
 						$file->clean_filename('avatar', '', 'update_users');
-						$file->move_file(str_replace($phpbb_root_path, '', $upload_dir), true, true);
+						$file->move_file(str_replace($phpbb_root_path, '', $upload_dir), true, true, 0775);
 					}
 				}
 			break;
 
 			case 'export':
+				$cp = $phpbb_container->get('profilefields.manager');
+			
 				$sql = 'SELECT user_id, user_ip, user_regdate, username, user_password, user_email, user_birthday FROM ' . USERS_TABLE . ' WHERE user_type <> 2 ORDER BY user_id';
 				$result = $db->sql_query($sql);
 				$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<USERS>\n\n";
 				while ($row = $db->sql_fetchrow($result))
 				{
-					$cp = $phpbb_container->get('profilefields.manager');
 					$profile_fields = $cp->grab_profile_fields_data($row['user_id']);
 
 					$xml .= "\t<user>\n";
@@ -455,34 +417,5 @@ class exportimportusers_module
 		}
 
 	$template->assign_vars(array('U_ACTION' =>  $this->u_action, 'EXPORTURL' => $this->u_action . '&amp;action=export'));
-	}
-
-	/**
-	* Check the version and return the available updates.
-	*
-	* @param \phpbb\extension\metadata_manager $md_manager The metadata manager for the version to check.
-	* @param bool $force_update Ignores cached data. Defaults to false.
-	* @param bool $force_cache Force the use of the cache. Override $force_update.
-	* @return string
-	* @throws RuntimeException
-	*/
-	protected function version_check(\phpbb\extension\metadata_manager $md_manager, $force_update = false, $force_cache = false)
-	{
-		global $cache, $config, $user;
-		$meta = $md_manager->get_metadata('all');
-
-		if (!isset($meta['extra']['version-check']))
-		{
-			throw new \RuntimeException($this->user->lang('NO_VERSIONCHECK'), 1);
-		}
-
-		$version_check = $meta['extra']['version-check'];
-
-		$version_helper = new \phpbb\version_helper($cache, $config, new \phpbb\file_downloader(), $user);
-		$version_helper->set_current_version($meta['version']);
-		$version_helper->set_file_location($version_check['host'], $version_check['directory'], $version_check['filename']);
-		$version_helper->force_stability($config['extension_force_unstable'] ? 'unstable' : null);
-
-		return $updates = $version_helper->get_suggested_updates($force_update, $force_cache);
 	}
 }

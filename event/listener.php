@@ -19,48 +19,33 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 */
 class listener implements EventSubscriberInterface
 {
-	/* @var \phpbb\controller\helper */
-	protected $helper;
+	protected $user;
 
 	/**
 	* Constructor
-	*
-	* @param \phpbb\controller\helper    $helper        Controller helper object
 	*/
-	public function __construct(\phpbb\controller\helper $helper)
+	public function __construct(\phpbb\user $user)
 	{
-		$this->helper = $helper;
+		$this->user = $user;
 	}
 
 	static public function getSubscribedEvents()
 	{
 		return array(
 			'core.get_logs_modify_entry_data'	=> 'edit_additional_data',
-			'core.user_setup'					=> 'load_language_on_setup',
 		);
 	}
 
 	public function edit_additional_data($event)
 	{
-		global $_SID ;
 		$additional_data = $event['row'];
 		foreach($additional_data as $key => $value)
 		{
-			if ($key == 'log_data' && $value != '')
+			if ($key == 'log_data' && strpos($value, '{_SID}') && $value != '')
 			{
-				$additional_data['log_data'] = serialize(str_replace('{_SID}', $_SID, unserialize($value)));
+				$additional_data['log_data'] = serialize(str_replace('{_SID}', $this->user->session_id, unserialize($value)));
 			}
 		}
 		$event['row'] = $additional_data;
-	}
-
-	public function load_language_on_setup($event)
-	{
-		$lang_set_ext = $event['lang_set_ext'];
-		$lang_set_ext[] = array(
-			'ext_name' => 'forumhulp/exportimportusers',
-			'lang_set' => 'acp/info_acp_export_import_users',
-		);
-		$event['lang_set_ext'] = $lang_set_ext;
 	}
 }

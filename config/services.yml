@@ -2,6 +2,6 @@ services:
     forumhulp.exportimportusers.listener:
         class: forumhulp\exportimportusers\event\listener
         arguments:
-            - @controller.helper
+            - @user
         tags:
             - { name: event.listener }
