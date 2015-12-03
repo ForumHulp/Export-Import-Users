@@ -58,7 +58,7 @@ class exportimportusers_module
 							$xml .= "\t<user>\n";
 							foreach($value as $key2 => $value2)
 							{
-								$xml .= "\t\t<".$key2.">".$value2."</".$key2.">\n";		
+								$xml .= "\t\t<".$key2.">".$value2."</".$key2.">\n";
 							}
 							$xml .= "\t</user>\n\n";
 						}
@@ -290,7 +290,7 @@ class exportimportusers_module
 
 			case 'export':
 				$cp = $phpbb_container->get('profilefields.manager');
-			
+
 				$sql = 'SELECT user_id, user_ip, user_regdate, username, user_password, user_email, user_birthday FROM ' . USERS_TABLE . ' WHERE user_type <> 2 ORDER BY user_id';
 				$result = $db->sql_query($sql);
 				$xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<USERS>\n\n";

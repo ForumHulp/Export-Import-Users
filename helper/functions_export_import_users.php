@@ -7,6 +7,8 @@
 *
 */
 
+namespace forumhulp\exportimportusers;
+
 class function_export_import_users_update
 {
 	protected $user_id;

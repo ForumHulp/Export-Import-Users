@@ -38,7 +38,7 @@ class ext extends \phpbb\extension\base
 				$this->container->get('user')->add_lang_ext('forumhulp/exportimportusers', 'info_acp_exportimportusers');
 				$this->container->get('template')->assign_var('L_EXTENSION_ENABLE_SUCCESS', $this->container->get('user')->lang['EXTENSION_ENABLE_SUCCESS'] .
 				(isset($this->container->get('user')->lang['EXIMPORT_NOTICE']) ?
-					sprintf($this->container->get('user')->lang['EXIMPORT_NOTICE'], 
+					sprintf($this->container->get('user')->lang['EXIMPORT_NOTICE'],
 								$this->container->get('user')->lang['ACP_CAT_USERGROUP'],
 								$this->container->get('user')->lang['ACP_CAT_USERS'],
 								$this->container->get('user')->lang['ACP_EXPORT_IMPORT_USERS']) : ''));
