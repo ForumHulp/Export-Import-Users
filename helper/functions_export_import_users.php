@@ -7,24 +7,11 @@
 *
 */
 
-namespace forumhulp\exportimportusers;
-
-class function_export_import_users_update
+function export_import_users_update($aa)
 {
-	protected $user_id;
-	protected $username;
-	protected $user_email;
-	protected $user_from;
-	protected $user_website;
-	protected $user_occ;
-	protected $user_password;
-
-	public function export_import_users_update($aa)
+	foreach ($aa as $k => $v)
 	{
-		foreach ($aa as $k => $v)
-		{
-			$this->$k = $aa[$k];
-		}
+		$this->$k = $aa[$k];
 	}
 }
 
