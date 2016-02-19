@@ -88,8 +88,9 @@ class exportimportusers_module
 									'user_birthday'	=> $value['user_birthday']);
 							} else
 							{
-								$sql = 'SELECT user_id, username, user_email FROM ' . USERS_TABLE . '
-										WHERE (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';
+								$sql = 'SELECT user_id, username, user_email FROM ' . USERS_TABLE . "
+										WHERE (username_clean = '" . $db->sql_escape(utf8_clean_string($value['username'])) . "'
+										AND user_email = '" . $db->sql_escape($value['user_email']) . "')";
 								$result = $db->sql_query($sql);
 								$row = $db->sql_fetchrow($result);
 								$parsed[$row['user_id']] = array(
@@ -196,7 +197,7 @@ class exportimportusers_module
 								$db->sql_query($sql);
 
 								// Place into appropriate group...
-								$sql = 'SELECT group_id FROM ' . GROUPS_TABLE . ' WHERE group_name = "REGISTERED" AND group_type = ' . GROUP_SPECIAL;
+								$sql = 'SELECT group_id FROM ' . GROUPS_TABLE . " WHERE group_name = 'REGISTERED' AND group_type = " . GROUP_SPECIAL;
 								$result = $db->sql_query($sql);
 								$group_id = $db->sql_fetchfield('group_id');
 								$db->sql_freeresult($result);
@@ -373,7 +374,9 @@ class exportimportusers_module
 						substr($value['user_password'], 0,3) == '$P$')) || (strlen($value['user_password']) == 60 &&
 						(substr($value['user_password'], 0,3) == '$2y')))  ? ' Password ok' : 'Password not ok';
 				$sql = 'SELECT user_id, username, user_password, user_email FROM ' . USERS_TABLE . '
-						WHERE ' . (($value['user_id']) ? 'user_id = ' . $value['user_id'] . ' OR' : '') . ' (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';
+						WHERE ' . (($value['user_id']) ? 'user_id = ' . $value['user_id'] . ' OR ' : '') . "
+						(username_clean = '" . $db->sql_escape(utf8_clean_string($value['username'])) . "'
+						AND user_email = '" . $db->sql_escape($value['user_email']) . "')";
 
 				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
