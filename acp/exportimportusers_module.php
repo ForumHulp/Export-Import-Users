@@ -307,7 +307,7 @@ class exportimportusers_module
 					$xml .= "\t\t<user_birthday>".$row['user_birthday']."</user_birthday>\n";
 					foreach($profilearay as $id => $fieldvalue)
 					{
-						if (isset($profile_fields[$row['user_id']]))
+						if (isset($profile_fields[$row['user_id']][$fieldvalue]))
 						{
 							$xml .= "\t\t<".$fieldvalue.">".$profile_fields[$row['user_id']][$fieldvalue]['value']."</".$fieldvalue.">\n";
 						}
@@ -373,7 +373,7 @@ class exportimportusers_module
 						substr($value['user_password'], 0,3) == '$P$')) || (strlen($value['user_password']) == 60 &&
 						(substr($value['user_password'], 0,3) == '$2y')))  ? ' Password ok' : 'Password not ok';
 				$sql = 'SELECT user_id, username, user_password, user_email FROM ' . USERS_TABLE . '
-						WHERE user_id = ' . $value['user_id'] . ' OR (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';
+						WHERE ' . (($value['user_id']) ? 'user_id = ' . $value['user_id'] . ' OR' : '') . ' (username_clean = "' . utf8_clean_string($value['username']) . '" AND user_email = "' . $value['user_email'] . '")';
 
 				$result = $db->sql_query($sql);
 				$row = $db->sql_fetchrow($result);
