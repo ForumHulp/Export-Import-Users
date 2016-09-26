@@ -56,7 +56,7 @@ class exportimportusers_module
 						} else
 						{
 							$xml .= "\t<user>\n";
-							foreach($value as $key2 => $value2)
+							foreach ($value as $key2 => $value2)
 							{
 								$xml .= "\t\t<".$key2.">".$value2."</".$key2.">\n";
 							}
@@ -103,7 +103,7 @@ class exportimportusers_module
 								$value['user_id'] = $row['user_id'];
 							}
 							$cp_data = array();
-							foreach($profilearay as $id => $fieldvalue)
+							foreach ($profilearay as $id => $fieldvalue)
 							{
 								if (isset($value[$fieldvalue]))
 								{
@@ -126,7 +126,7 @@ class exportimportusers_module
 									'user_birthday'		=> $parsed[$userid]['user_birthday']);
 
 						$cp_data = array();
-						foreach($profilearay as $id => $fieldvalue)
+						foreach ($profilearay as $id => $fieldvalue)
 						{
 							if (isset($parsed[$userid][$fieldvalue]))
 							{
@@ -306,7 +306,7 @@ class exportimportusers_module
 					$xml .= "\t\t<username>".$row['username']."</username>\n";
 					$xml .= "\t\t<user_email>".$row['user_email']."</user_email>\n";
 					$xml .= "\t\t<user_birthday>".$row['user_birthday']."</user_birthday>\n";
-					foreach($profilearay as $id => $fieldvalue)
+					foreach ($profilearay as $id => $fieldvalue)
 					{
 						if (isset($profile_fields[$row['user_id']][$fieldvalue]))
 						{
