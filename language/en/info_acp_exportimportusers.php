@@ -23,7 +23,7 @@ if (empty($lang) || !is_array($lang))
 $lang = array_merge($lang, array(
 	'ACP_EXPORT_IMPORT_USERS'	=> 'Ex- Import Users',
 
-	'ACP_EXPORT_IMPORT_USERS_EXPLAIN'	=> 'Ex- Import users from other phpBB usertables. Existing users will be updated, non existing users will be added. You can only update or insert users if all are valid. The xml file will be deleted after insert or update. ',
+	'ACP_EXPORT_IMPORT_USERS_EXPLAIN'	=> 'Ex- Import users from other phpBB usertables. Existing users will be updated, non existing users will be added. You can only update or insert users if all are valid. The xml file will be deleted after insert or update.',
 	'LOG_USER_ERROR'	=> '<strong>Users not inserted or updated</strong><br />» %s',
 	'LOG_USER_CHANGE'	=> '<strong>Users updated</strong><br />» %s',
 	'FH_HELPER_NOTICE'	=> 'Forumhulp helper application does not exist!<br />Download <a href="https://github.com/ForumHulp/helper" target="_blank">forumhulp/helper</a> and copy the helper folder to your forumhulp extension folder.',
