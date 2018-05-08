@@ -24,6 +24,12 @@ $lang = array_merge($lang, array(
 	'ACP_EXPORT_IMPORT_USERS'	=> 'Ex- Import Users',
 
 	'ACP_EXPORT_IMPORT_USERS_EXPLAIN'	=> 'Ex- Import users from other phpBB usertables. Existing users will be updated, non existing users will be added. You can only update or insert users if all are valid. The xml file will be deleted after insert or update.',
+	'USERS_UPDATED'		=> '%s users updated',
+	'NOT_ALL_UPDATED'	=> 'Not all users are imported / updated',
+	'MORE_THEN'			=> 'More then %s user\'s to update!',
+	'FILE_NOT_EXCISTS'	=> 'File "update_users.xml" doesn\'t excists!',
+	'PASS_OK'			=> 'Password ok',
+	'PASS_NOK'			=> 'Password not ok',
 	'LOG_USER_ERROR'	=> '<strong>Users not inserted or updated</strong><br />» %s',
 	'LOG_USER_CHANGE'	=> '<strong>Users updated</strong><br />» %s',
 	'FH_HELPER_NOTICE'	=> 'Forumhulp helper application does not exist!<br />Download <a href="https://github.com/ForumHulp/helper" target="_blank">forumhulp/helper</a> and copy the helper folder to your forumhulp extension folder.',
