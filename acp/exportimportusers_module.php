@@ -87,7 +87,7 @@ class exportimportusers_module
 								$pass = ((strlen($value['user_password']) == 34 && (substr($value['user_password'], 0,3) == '$H$' ||
 										substr($value['user_password'], 0,3) == '$P$')) || (strlen($value['user_password']) == 60 &&
 										(substr($value['user_password'], 0,3) == '$2y'))) ? true : false;
-				
+
 								if (!$pass && $value['user_password'] != '')
 								{
 									 if (validate_password($value['user_password']) === false && validate_string($value['user_password'], false, $config['min_pass_chars'], $config['max_pass_chars']) === false)
@@ -207,7 +207,6 @@ class exportimportusers_module
 							$sql = 'INSERT INTO ' . USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_aray);
 							$db->sql_query($sql);
 							$user_id = $db->sql_nextid();
-
 
 							if (!class_exists('messenger'))
 							{
@@ -453,8 +452,8 @@ class exportimportusers_module
 						'NEWNAME' 	=> $value['username'],
 						'NEWEMAIL'	=> $value['user_email'],
 						'NEWCITY' 	=> (isset($value['phpbb_location'])) ? $value['phpbb_location'] : '',
-						'TOOLTIP'	=> $user->lang['USERNAME'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['username']) . "\n" . 
-									   $user->lang['PASSWORD'] . $user->lang['COLON'] . ' ' . (($pass) ? $user->lang['PASS_OK'] : $user->lang['PASS_NOK']) . "\n" . 
+						'TOOLTIP'	=> $user->lang['USERNAME'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['username']) . "\n" .
+									   $user->lang['PASSWORD'] . $user->lang['COLON'] . ' ' . (($pass) ? $user->lang['PASS_OK'] : $user->lang['PASS_NOK']) . "\n" .
 									   $user->lang['EMAIL'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['user_email']) .
 									   (sizeof($disabled) ? "\nErrors: " . implode("\n",  $disabled) : ''),
 						'VALIDATED'	=> (!sizeof($disabled)) ? '&radic;' : '<a style="color:red;" href="'.$this->u_action . '&amp;action=delete&amp;id='.$value['user_id'].'">' . $user->lang['DELL'] . '</a>'
