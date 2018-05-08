@@ -217,7 +217,7 @@ class exportimportusers_module
 							$messenger = new \messenger(true);
 							$messenger->set_mail_priority(MAIL_HIGH_PRIORITY);
 							($use_html) ? $messenger->set_mail_html(true) : null;
-													   
+
 							$messenger->headers('X-AntiAbuse: Board servername - ' . $config['server_name']);
 							$messenger->headers('X-AntiAbuse: User_id - ' . $user_id);
 							$messenger->headers('X-AntiAbuse: Username - ' . $sql_aray['username']);
@@ -474,7 +474,7 @@ class exportimportusers_module
 						'NEWEMAIL'	=> $value['user_email'],
 						'CITY' 		=> isset($profile_fields[$row['user_id']]['phpbb_location']['value']) ? $profile_fields[$row['user_id']]['phpbb_location']['value'] : '',
 						'NEWCITY' 	=> isset($value['phpbb_location']) ? $value['phpbb_location'] : '',
-						'TOOLTIP'	=> $user->lang['USERNAME'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['username']) . "\n" . 
+						'TOOLTIP'	=> $user->lang['USERNAME'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['username']) . "\n" .
 									   $user->lang['PASSWORD'] . $user->lang['COLON'] . ' ' . (($pass) ? $user->lang['PASS_OK'] : $user->lang['PASS_NOK']) . "\n" .
 									   $user->lang['EMAIL'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['user_email']) .
 									   (sizeof($disabled) ? "\nErrors: " . implode("\n",  $disabled) : ''),
