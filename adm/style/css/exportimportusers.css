@@ -2,3 +2,22 @@
 
 h1 {position: relative;}
 #circle {float: right; font-size: 30px;}
+#user_import {clear:both;}
+fieldset {background: url('images/spacer.png') repeat;border:none;position:relative;}
+.legend2 {position:absolute;top:-0.2em;right:20px;padding:1px 0;font-family: Tahoma,arial,Verdana,Sans-serif;font-size:0.9em;font-weight:bold;color:#115098;margin-top:-0.4em;text-transform:none;line-height:1.2em;vertical-align:middle;cursor:pointer;}
+
+#acp_user_import td:nth-child(1) {width:3%;text-align:center;}
+#acp_user_import td:nth-child(2) {width:7%;text-align:center;}
+#acp_user_import td:nth-child(9) {text-align:center;}
+
+#acp_newuser_import td:nth-child(1) {width:7%;text-align:center;}
+#acp_newuser_import td:nth-child(5) {text-align:center;}
+
+.history li {float:left;list-style-type:none; width:20%;}
+.history li:hover { background-color:#ECECEC;}
+.history li span {float:right;margin-right:10px;}
+
+.fileinputs {text-align:left;}
+.fileinputs > label {font-size:1.2em;font-weight:700;color:white;background-color:#105289;display:inline-block;padding:5px;}
+.fileinputs > label > span {font-size:.7em;font-weight:normal;}
+.fileinputs > input {width:0.1px;height:0.1px;opacity:0;overflow:hidden;position:absolute;z-index:-1;}

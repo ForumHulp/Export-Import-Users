@@ -1,8 +1,4 @@
-<!-- IF S_ALLOW_CDN -->
-<!-- INCLUDECSS //maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css -->
-<!-- ELSE -->
-<!-- INCLUDECSS {ROOT_PATH}ext/forumhulp/helper/css/font-awesome.min.css -->
-<!-- ENDIF -->
+<!-- IF not VIEW_TABLE -->
 <!-- INCLUDECSS css/exportimportusers.css -->
 <!-- INCLUDECSS {ROOT_PATH}ext/forumhulp/helper/css/jquery.simpledialog.css -->
 <!-- INCLUDECSS {ROOT_PATH}ext/forumhulp/helper/css/ext_details.css -->
@@ -13,30 +9,34 @@
 <h1>{L_ACP_EXPORT_IMPORT_USERS} <a href="{U_ACTION}&amp;action=details" class="simpledialog"><i class="fa fa-info-circle"></i></a></h1>
 
 <p>{L_ACP_EXPORT_IMPORT_USERS_EXPLAIN}</p>
-<a style="float:right;" href="{EXPORTURL}">Export users</a><br style="clear:both;" />
+<a class="pull-right clear" href="{EXPORTURL}">{L_EXPORT_USERS}</a>
+<div id="user_import">
+<!-- ENDIF -->
 <!-- IF S_ERROR -->
 	<div class="{BOX}">
 		<p>{ERROR}</p>
 	</div>
     <form id="acp_file_upload" name="acp_file_upload" method="post" action="" enctype="multipart/form-data">
-    <input type="file" name="uploadfile" size="40" maxlength="40" value="" class="btnfile" /> 
-    <input type="hidden" id="action" name="action" value="add_file" /><input class="button1" type="submit" name="submit" value="Add file" />
+    <div class="fileinputs">
+        <input type="file" class="inputfile" id="uploadfile" name="uploadfile" size="10" data-multiple-caption="count {L_FILE_UPLOADING}" accept=".xml" />
+        <label for="uploadfile"><i class="fa fa-upload"></i> <span>{L_SELECT_FILE}</span></label>
+    </div>
     </form>
 <!-- ELSE -->
 <form id="acp_user_import" method="post" action="">
 <fieldset>
-    <legend>Existing users</legend>
-    <table style="width:100%;">
+    <legend>{L_EXISTING_USERS}</legend>
+    <table>
     <tr>
-        <th style=" width:3%;">ID</th>
-        <th style=" width:7%;">New ID</th>
-        <th>User name</th>
-        <th>New name</th>
-        <th>E-mail</th>
-        <th>New E-mail</th>
-        <th>From</th>
-        <th>New From</th>
-        <th>Valid</th>
+        <th>{L_ID}</th>
+        <th>{L_OLD} {L_ID}</th>
+        <th>{L_USERNAME}</th>
+        <th>{L_NEW} {L_USERNAME}</th>
+        <th>{L_EMAIL}</th>
+        <th>{L_NEW} {L_EMAIL}</th>
+        <th>{L_FROM}</th>
+        <th>{L_NEW} {L_FROM}</th>
+        <th>{L_VALID}</th>
     </tr>
     <!-- BEGIN members -->
         <tr title="{members.TOOLTIP}" <!-- IF members.S_ROW_COUNT is even -->class="row1"<!-- ELSE -->class="row2"<!-- ENDIF --><!-- IF members.VALIDATED neq '&radic;' --> style="color:red;"<!-- ENDIF -->>
@@ -48,24 +48,24 @@
             <td>{members.NEWEMAIL}</td>
             <td>{members.CITY}</td>
             <td>{members.NEWCITY}<!-- IF members.VALIDATED --><input type="hidden" id="userid[{members.ID}]" name="userid[{members.ID}]" value="{members.ID}" /><!-- ENDIF --></td>
-            <td style="text-align:center;">{members.VALIDATED}</td>
+            <td>{members.VALIDATED}</td>
         </tr>
         <!-- END members -->
     </table>
-    <p><input type="hidden" id="action" name="action" value="save" /><input class="button1" type="submit" id="submit" name="submit"{DISABLEUPDATE} value="{L_SUBMIT}" /></p>
+    <p><input type="hidden" name="action" value="save" /><input class="button1" type="submit" name="submit"{DISABLEUPDATE} value="{L_UPDATE}" /></p>
 </fieldset>
 </form>
 <!-- IF .membersnotfound -->
 <form id="acp_newuser_import" method="post" action="">
 <fieldset>
-    <legend>Non existing users</legend>
-    <table style="width:100%;">
+    <legend>{L_NON} {L_EXISTING_USERS}</legend>
+    <table>
     <tr>
-        <th style=" width:7%;">New ID</th>
-        <th>New name</th>
-        <th>New E-mail</th>
-        <th>New From</th>
-        <th>Valid</th>
+        <th>{L_OLD} {L_ID}</th>
+        <th>{L_NEW} {L_USERNAME}</th>
+        <th>{L_NEW} {L_EMAIL}</th>
+        <th>{L_NEW} {L_FROM}</th>
+        <th>{L_VALID}</th>
     </tr>
     <!-- BEGIN membersnotfound -->
         <tr title="{membersnotfound.TOOLTIP}" <!-- IF membersnotfound.S_ROW_COUNT is even -->class="row1"<!-- ELSE -->class="row2"<!-- ENDIF --><!-- IF membersnotfound.VALIDATED neq '&radic;' --> style="color:red;"<!-- ENDIF -->>
@@ -73,19 +73,34 @@
             <td>{membersnotfound.NEWNAME}</td>
             <td>{membersnotfound.NEWEMAIL}</td>
             <td>{membersnotfound.NEWCITY}<!-- IF membersnotfound.VALIDATED --><input type="hidden" id="userid[{membersnotfound.NEWID}]" name="userid[{membersnotfound.NEWID}]" value="{membersnotfound.NEWID}" /><!-- ENDIF --></td>
-            <td style="text-align:center;">{membersnotfound.VALIDATED}</td>
+            <td>{membersnotfound.VALIDATED}</td>
         </tr>
         <!-- END membersnotfound -->
     </table>
-    <p><input type="hidden" id="action" name="action" value="save" /><input class="button1" type="submit" id="submit" name="submit"{DISABLEINSERT} value="Insert" /></p>
+    <p><input type="hidden" name="action" value="save" /><input class="button1" type="submit" name="submit"{DISABLEINSERT} value="{L_IMPORT}" /></p>
 </fieldset>
 </form>
 <!-- ENDIF -->
-    <form id="acp_file_upload" name="acp_file_upload" method="post" action="" enctype="multipart/form-data">
-    <input type="file" name="uploadfile" size="40" maxlength="40" value="" class="btnfile" /> 
-    <input type="hidden" id="action" name="action" value="add_file" /><input class="button1" type="submit" name="submit" value="Add file" />
-    </form>
+<form name="acp_file_upload" method="post" action="" enctype="multipart/form-data">
+<div class="fileinputs">
+    <input type="file" class="inputfile" id="uploadfile" name="uploadfile" size="10" data-multiple-caption="count {L_FILE_UPLOADING}" accept=".xml" />
+    <label for="uploadfile"><i class="fa fa-upload"></i> <span>{L_SELECT_FILE}</span></label>
+</div>
+</form>
 <!-- ENDIF -->
+<!-- IF .history -->
+<fieldset>
+    <legend>{L_HISTORY_USERS}</legend><div id="clear_history" class="legend2">{L_HISTORY_CLEAR}</div>
+<ul class="history">
+<!-- BEGIN history -->
+<li><i class="fa fa-upload"></i> {history.USERNAME} <span>{history.UPDATED}</span></li>
+<!-- END history -->
+</ul>
+</fieldset>
+<!-- ENDIF -->
+<!-- IF not VIEW_TABLE -->
+</div>
 <!-- INCLUDEJS {ROOT_PATH}ext/forumhulp/helper/js/jquery.simpledialog.js -->
 <!-- INCLUDEJS js/exportimportusers.js -->
 <!-- INCLUDE overall_footer.html -->
+<!-- ENDIF -->

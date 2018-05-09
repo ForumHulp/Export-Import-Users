@@ -15,7 +15,7 @@ function export_import_users_update($aa)
 	}
 }
 
-function readDatabase($filename)
+function readDatabase($filename, $time = false)
 {
 	// read the XML database of asaf_updates
 	$data = implode('', file($filename));
@@ -34,7 +34,9 @@ function readDatabase($filename)
 			{
 				$offset = $val[$i] + 1;
 				$len = $val[$i + 1] - $offset;
-				$tdb[] = parse_user(array_slice($values, $offset, $len));
+				$ik = parse_user(array_slice($values, $offset, $len));
+				($time) ? $ik['time'] = $time : null;
+				$tdb[] = $ik;
 			}
 		} else
 		{
@@ -51,6 +53,53 @@ function parse_user($mvalues)
 		$user_values[$mvalues[$i]['tag']] = (isset($mvalues[$i]['value'])) ? $mvalues[$i]['value'] : '';
 	}
 	return $user_values;
+}
+
+function history($dir)
+{
+	$history = array();
+	$files = @scandir($dir);
+
+	foreach ($files as $file)
+	{
+		if (strpos($file, '.xml') !== false)
+		{
+			$time = strtotime(substr(str_replace(array('user_update ', '.xml'), array('', ''), $file), 0, -9));
+			$his = readDatabase($dir . '/' . $file, $time);
+			$history = array_merge($history, $his);
+		}
+	}
+
+	$history = array_msort($history, array('time' => SORT_DESC, 'username' => SORT_ASC));
+	return $history;
+}
+
+function array_msort($array, $cols)
+{
+    $colarr = array();
+    foreach ($cols as $col => $order)
+	{
+        $colarr[$col] = array();
+        foreach ($array as $k => $row) {$colarr[$col]['_'.$k] = strtolower($row[$col]);}
+    }
+    $eval = 'array_multisort(';
+    foreach ($cols as $col => $order)
+	{
+        $eval .= '$colarr[\''.$col.'\'],'.$order.',';
+    }
+    $eval = substr($eval,0,-1).');';
+    eval($eval);
+    $ret = array();
+    foreach ($colarr as $col => $arr)
+	{
+        foreach ($arr as $k => $v)
+		{
+            $k = substr($k,1);
+            if (!isset($ret[$k])) $ret[$k] = $array[$k];
+            $ret[$k][$col] = $array[$k][$col];
+        }
+    }
+    return $ret;
 }
 
 function validate_import($importname = '', $newpassword = '', $newemail = '', $checkdbname = false)

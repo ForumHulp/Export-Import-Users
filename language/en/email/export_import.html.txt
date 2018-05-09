@@ -1,7 +1,7 @@
 Subject: Account imported at "{SITENAME}"
 
 <div style="width:100%;color:#fff;background-color:#051484;height:50px;padding-left:10px;">{SITENAME}</div>
-Hi {UNAME},<br /><br />
+<img src="{SITE_LOGO_IMG}" alt="" align="right" style="margin: 5px; border: 0px currentColor; float: right;" vspace="5px" hspace="5px" />Hi {UNAME},<br /><br />
 Your account is imported in our site.<br />
 Your username is "{UNAME}" and your password is "{PASS}".
 Please change your password as soon as possible.<br />

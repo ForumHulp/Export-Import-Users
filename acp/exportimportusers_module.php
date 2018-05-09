@@ -34,6 +34,7 @@ class exportimportusers_module
 
 		$filename = $phpbb_root_path . 'store/update_users.xml';
 		$updated = $notupdated = $parsed = array();
+		$viewtable = false;
 
 		switch ($action)
 		{
@@ -154,7 +155,7 @@ class exportimportusers_module
 							}
 						}
 
-						if ($request->variable('submit', '') == 'Insert')
+						if ($request->variable('submit', '') == $user->lang['IMPORT'])
 						{
 							$user_id = 0;
 							$sql_aray += array(
@@ -333,8 +334,25 @@ class exportimportusers_module
 					{
 						$file->clean_filename('avatar', '', 'update_users');
 						$file->move_file(str_replace($phpbb_root_path, '', $upload_dir), true, true, 0775);
+						$viewtable = true;
 					}
 				}
+			break;
+
+			case 'del_history':
+				$dir =  $phpbb_root_path . 'store' . DIRECTORY_SEPARATOR . 'user_updates/';
+				$it = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
+				$files = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::CHILD_FIRST);
+				foreach ($files as $file)
+				{
+					if ($file->isDir())
+					{
+						rmdir($file->getRealPath());
+					} else {
+						unlink($file->getRealPath());
+					}
+				}
+				$viewtable = true;
 			break;
 
 			case 'export':
@@ -487,7 +505,14 @@ class exportimportusers_module
 										'DISABLEUPDATE' => ($disableupdate) ?  '' : 'disabled="disabled"',
 										'MAXEXISTINGUSERS' => $maxusertoupdate));
 		}
-
-	$template->assign_vars(array('U_ACTION' =>  $this->u_action, 'EXPORTURL' => $this->u_action . '&amp;action=export'));
+	foreach (history($phpbb_root_path . '/store/user_updates') as $his)
+	{
+		$template->assign_block_vars('history', array(
+			'USERNAME'		=> $his['username'],
+			'UPDATED'		=> $user->format_date($his['time'], 'j F \'y')
+			)
+		);
+	}
+	$template->assign_vars(array('U_ACTION' => $this->u_action, 'EXPORTURL' => $this->u_action . '&amp;action=export', 'VIEW_TABLE' => $viewtable));
 	}
 }
