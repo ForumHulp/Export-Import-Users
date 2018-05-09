@@ -348,7 +348,8 @@ class exportimportusers_module
 					if ($file->isDir())
 					{
 						rmdir($file->getRealPath());
-					} else {
+					} else
+					{
 						unlink($file->getRealPath());
 					}
 				}

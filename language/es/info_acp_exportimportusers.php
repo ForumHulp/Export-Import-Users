@@ -22,8 +22,20 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	'ACP_EXPORT_IMPORT_USERS'	=> 'Expotar - Importar Usuarios',
-
 	'ACP_EXPORT_IMPORT_USERS_EXPLAIN'	=> 'Exportar - Importar Usuarios de otros usuarios de phpBB. Los usuarios existentes se actualizarán, se agregarán usuarios no existentes. Sólo puede actualizar, o insertar usuarios si todos son válidos. El archivo xml se eliminará después de insertar o actualizar.',
+	'EXPORT_USERS'		=> 'Export users',
+	'EXISTING_USERS'	=> 'Existing users',
+	'NON'				=> 'Non',
+	'ID'				=> 'id',
+	'NEW'				=> 'New',
+	'OLD'				=> 'Old',
+	'USERNAME'			=> 'Username',
+	'EMAIL'				=> 'E-mail',
+	'FROM'				=> 'From',
+	'VALID'				=> 'Valid',
+	'IMPORT'			=> 'Import',
+	'HISTORY_USERS'		=> 'History updated users',
+	'HISTORY_CLEAR'		=> 'Clear history',
 	'USERS_UPDATED'		=> '%s users updated',
 	'NOT_ALL_UPDATED'	=> 'Not all users are imported / updated',
 	'MORE_THEN'			=> 'More then %s user\'s to update!',

@@ -24,7 +24,6 @@ $lang = array_merge($lang, array(
 	'ACP_EXPORT_IMPORT_USERS'	=> 'Ex- Import Users',
 	'ACP_EXPORT_IMPORT_USERS_EXPLAIN'	=> 'Ex- Import users from other phpBB usertables. Existing users will be updated, non existing users will be added. You can only update or insert users if all are valid. The xml file will be deleted after insert or update.',
 	'EXPORT_USERS'		=> 'Export users',
-	
 	'EXISTING_USERS'	=> 'Existing users',
 	'NON'				=> 'Non',
 	'ID'				=> 'id',
@@ -37,7 +36,6 @@ $lang = array_merge($lang, array(
 	'IMPORT'			=> 'Import',
 	'HISTORY_USERS'		=> 'History updated users',
 	'HISTORY_CLEAR'		=> 'Clear history',
-	
 	'USERS_UPDATED'		=> '%s users updated',
 	'NOT_ALL_UPDATED'	=> 'Not all users are imported / updated',
 	'MORE_THEN'			=> 'More then %s user\'s to update!',
