@@ -42,6 +42,8 @@ $lang = array_merge($lang, array(
 	'FILE_NOT_EXCISTS'	=> 'File "update_users.xml" doesn\'t excists!',
 	'PASS_OK'			=> 'Password ok',
 	'PASS_NOK'			=> 'Password not ok',
+	'SELECT_FILE'		=> 'Select file to upload',
+	'FILE_UPLOADING'	=> 'file uploading',
 	'LOG_USER_ERROR'	=> '<strong>Usuarios no insertados o actualizados</strong><br />» %s',
 	'LOG_USER_CHANGE'	=> '<strong>Usuarios actualizados</strong><br />» %s',
 	'FH_HELPER_NOTICE'	=> '¡La aplicación Forumhulp helper no existe!<br />Descargar <a href="https://github.com/ForumHulp/helper" target="_blank">forumhulp/helper</a> y copie la carpeta helper dentro de la carpeta de extensión forumhulp.',

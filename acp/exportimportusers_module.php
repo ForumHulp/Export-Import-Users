@@ -267,9 +267,9 @@ class exportimportusers_module
 
 								$updated[] = '<a href="' . $phpbb_admin_path . 'index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
 								unset($parsed[$userid]);
-								set_config('newest_user_id', $user_id, true);
-								set_config('newest_username', $sql_aray['username'], true);
-								set_config_count('num_users', 1, true);
+								$config->set('newest_user_id', $user_id, true);
+								$config->set('newest_username', $sql_aray['username'], true);
+								$config->increment('num_users', 1, true);
 							}
 
 						} else
@@ -288,7 +288,7 @@ class exportimportusers_module
 					}
 					if (sizeof($updated))
 					{
-						add_log('admin', 'LOG_USER_CHANGE', implode(', ', $updated));
+						$phpbb_log->add('admin', 'LOG_USER_CHANGE', implode(', ', $updated));
 					}
 
 					if (sizeof($parsed))
@@ -297,7 +297,7 @@ class exportimportusers_module
 						{
 							$notupdated[] = $value['username'];
 						}
-						add_log('admin', 'LOG_USER_ERROR', implode(', ', $notupdated));
+						$phpbb_log->add('admin', 'LOG_USER_ERROR', implode(', ', $notupdated));
 					}
 					if (!file_exists($phpbb_root_path . 'store/user_updates'))
 					{

@@ -44,6 +44,8 @@ $lang = array_merge($lang, array(
 	'FILE_NOT_EXCISTS'	=> 'File "update_users.xml" doesn\'t excists!',
 	'PASS_OK'			=> 'Password ok',
 	'PASS_NOK'			=> 'Password not ok',
+	'SELECT_FILE'		=> 'Select file to upload',
+	'FILE_UPLOADING'	=> 'file uploading',
 	'LOG_USER_ERROR'	=> '<strong>Utilisateurs non insérés ni mis à jour</strong><br />» %s',
 	'LOG_USER_CHANGE'	=> '<strong>Utilisateurs mis à jour</strong><br />» %s',
 	'FH_HELPER_NOTICE'	=> 'L’extension : « Forumhulp Helper » n’est pas installée !<br />Il est nécessaire de télécharger son archive disponible sur cette page : <a href="https://github.com/ForumHulp/helper" target="_blank">Forumhulp Helper</a>, puis de l’envoyer sur son espace FTP et de l’activer.',
