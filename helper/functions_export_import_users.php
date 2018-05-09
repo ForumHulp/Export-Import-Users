@@ -70,42 +70,29 @@ function history($dir)
 		}
 	}
 
-	$history = array_msort($history, array('time' => SORT_DESC, 'username' => SORT_ASC));
+	$history = array_orderby($history, 'time', SORT_DESC, 'username', SORT_ASC);
 	return $history;
 }
 
-function array_msort($array, $cols)
+function array_orderby()
 {
-	$colarr = array();
-	foreach ($cols as $col => $order)
+	$args = func_get_args();
+	$data = array_shift($args);
+	foreach ($args as $n => $field)
 	{
-		$colarr[$col] = array();
-		foreach ($array as $k => $row)
+		if (is_string($field))
 		{
-			$colarr[$col]['_'.$k] = strtolower($row[$col]);
-		}
-	}
-	$eval = 'array_multisort(';
-	foreach ($cols as $col => $order)
-	{
-		$eval .= '$colarr[\''.$col.'\'],'.$order.',';
-	}
-	$eval = substr($eval,0,-1).');';
-	eval($eval);
-	$ret = array();
-	foreach ($colarr as $col => $arr)
-	{
-		foreach ($arr as $k => $v)
-		{
-			$k = substr($k,1);
-			if (!isset($ret[$k]))
+			$tmp = array();
+			foreach ($data as $key => $row)
 			{
-				$ret[$k] = $array[$k];
+				$tmp[$key] = $row[$field];
 			}
-			$ret[$k][$col] = $array[$k][$col];
+			$args[$n] = $tmp;
 		}
 	}
-	return $ret;
+	$args[] = &$data;
+	call_user_func_array('array_multisort', $args);
+	return array_pop($args);
 }
 
 function validate_import($importname = '', $newpassword = '', $newemail = '', $checkdbname = false)
