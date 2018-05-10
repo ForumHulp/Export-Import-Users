@@ -22,6 +22,7 @@ function export_import_users_update($aa)
 
 function readDatabase($filename, $time = false)
 {
+	$tdb = array();
 	// read the XML database of asaf_updates
 	$data = implode('', file($filename));
 	$parser = xml_parser_create();
@@ -63,11 +64,11 @@ function parse_user($mvalues)
 function history($dir)
 {
 	$history = array();
-	$files = @scandir($dir);
+	$files = array_diff(scandir($dir), array('..', '.'));
 
 	foreach ($files as $file)
 	{
-		if (strpos($file, '.xml') !== false)
+		if (file_exists($dir . '/' . $file) && strpos($file, '.xml') !== false)
 		{
 			$time = strtotime(substr(str_replace(array('user_update ', '.xml'), array('', ''), $file), 0, -9));
 			$his = readDatabase($dir . '/' . $file, $time);
@@ -75,7 +76,7 @@ function history($dir)
 		}
 	}
 
-	$history = array_orderby($history, 'time', SORT_DESC, 'username', SORT_ASC);
+	$history = (sizeof($history)) ? array_orderby($history, 'time', SORT_DESC, 'username', SORT_ASC) : array();
 	return $history;
 }
 

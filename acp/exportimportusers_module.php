@@ -507,6 +507,7 @@ class exportimportusers_module
 										'DISABLEUPDATE' => ($disableupdate) ?  '' : 'disabled="disabled"',
 										'MAXEXISTINGUSERS' => $maxusertoupdate));
 		}
+	
 	foreach (history($phpbb_root_path . '/store/user_updates') as $his)
 	{
 		$template->assign_block_vars('history', array(
