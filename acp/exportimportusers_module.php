@@ -12,7 +12,6 @@ namespace forumhulp\exportimportusers\acp;
 class exportimportusers_module
 {
 	var $u_action;
-
 	function main($id, $mode)
 	{
 		global $config, $db, $user, $phpbb_log, $template;
