@@ -7,6 +7,11 @@
 *
 */
 
+if (!defined('IN_PHPBB'))
+{
+	exit;
+}
+
 function export_import_users_update($aa)
 {
 	foreach ($aa as $k => $v)

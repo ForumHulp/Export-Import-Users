@@ -15,8 +15,9 @@ class exportimportusers_module
 
 	function main($id, $mode)
 	{
-		global $config, $db, $user, $auth, $template, $cache;
+		global $config, $db, $user, $phpbb_log, $template;
 		global $phpbb_root_path, $phpbb_admin_path, $phpEx, $phpbb_container, $disabled, $request;
+		$password_manager = $phpbb_container->get('passwords.manager');
 		include($phpbb_root_path . 'ext/forumhulp/exportimportusers/helper/functions_export_import_users.' . $phpEx);
 
 		$submit	= (isset($_POST['submit'])) ? true : false;
@@ -94,7 +95,7 @@ class exportimportusers_module
 									 if (validate_password($value['user_password']) === false && validate_string($value['user_password'], false, $config['min_pass_chars'], $config['max_pass_chars']) === false)
 									 {
 										 $parsed[$value['user_id']]['user_password_txt'] = $value['user_password'];
-										 $value['user_password'] = phpbb_hash($value['user_password']);
+										 $value['user_password'] = $passwords_manager->hash($value['user_password']);
 										 $pass = true;
 									 }
 								}
@@ -288,7 +289,7 @@ class exportimportusers_module
 					}
 					if (sizeof($updated))
 					{
-						$phpbb_log->add('admin', 'LOG_USER_CHANGE', implode(', ', $updated));
+						$phpbb_log->add('admin', $user->data['user_id'], $user->ip, 'LOG_USER_CHANGE', false, array(implode(', ', $updated)));
 					}
 
 					if (sizeof($parsed))
@@ -297,7 +298,7 @@ class exportimportusers_module
 						{
 							$notupdated[] = $value['username'];
 						}
-						$phpbb_log->add('admin', 'LOG_USER_ERROR', implode(', ', $notupdated));
+						$phpbb_log->add('admin', $user->data['user_id'], $user->ip, 'LOG_USER_ERROR', false, aaray(implode(', ', $notupdated)));
 					}
 					if (!file_exists($phpbb_root_path . 'store/user_updates'))
 					{
@@ -450,7 +451,7 @@ class exportimportusers_module
 				{
 					 if (validate_password($value['user_password']) === false && validate_string($value['user_password'], false, $config['min_pass_chars'], $config['max_pass_chars']) === false)
 					 {
-						 $value['user_password'] = phpbb_hash($value['user_password']);
+						 $value['user_password'] = $password_manager->hash($value['user_password']);
 						 $pass = true;
 					 }
 				}
