@@ -15,8 +15,9 @@ class exportimportusers_module
 
 	function main($id, $mode)
 	{
-		global $config, $db, $user, $auth, $template, $cache;
+		global $config, $db, $user, $phpbb_log, $template;
 		global $phpbb_root_path, $phpbb_admin_path, $phpEx, $phpbb_container, $disabled, $request;
+		$password_manager = $phpbb_container->get('passwords.manager');
 		include($phpbb_root_path . 'ext/forumhulp/exportimportusers/helper/functions_export_import_users.' . $phpEx);
 
 		$submit	= (isset($_POST['submit'])) ? true : false;
@@ -34,6 +35,7 @@ class exportimportusers_module
 
 		$filename = $phpbb_root_path . 'store/update_users.xml';
 		$updated = $notupdated = $parsed = array();
+		$viewtable = false;
 
 		switch ($action)
 		{
@@ -56,7 +58,7 @@ class exportimportusers_module
 						} else
 						{
 							$xml .= "\t<user>\n";
-							foreach($value as $key2 => $value2)
+							foreach ($value as $key2 => $value2)
 							{
 								$xml .= "\t\t<".$key2.">".$value2."</".$key2.">\n";
 							}
@@ -74,12 +76,31 @@ class exportimportusers_module
 					$parsed_array = readDatabase($filename);
 					if (sizeof($parsed_array))
 					{
-						$parsed = array();
+						if (!function_exists('validate_password'))
+						{
+							include_once($phpbb_root_path . 'includes/functions_user.' . $phpEx);
+						}
+
 						foreach ($parsed_array as $key => $value)
 						{
 							if (in_array($value['user_id'], $user_ids))
 							{
-								$parsed[$value['user_id']] = array(
+								$parsed[$value['user_id']] = array();
+								$pass = ((strlen($value['user_password']) == 34 && (substr($value['user_password'], 0,3) == '$H$' ||
+										substr($value['user_password'], 0,3) == '$P$')) || (strlen($value['user_password']) == 60 &&
+										(substr($value['user_password'], 0,3) == '$2y'))) ? true : false;
+
+								if (!$pass && $value['user_password'] != '')
+								{
+									 if (validate_password($value['user_password']) === false && validate_string($value['user_password'], false, $config['min_pass_chars'], $config['max_pass_chars']) === false)
+									 {
+										 $parsed[$value['user_id']]['user_password_txt'] = $value['user_password'];
+										 $value['user_password'] = $passwords_manager->hash($value['user_password']);
+										 $pass = true;
+									 }
+								}
+
+								$parsed[$value['user_id']] += array(
 									'user_ip'		=> $value['user_ip'],
 									'user_regdate'	=> $value['user_regdate'],
 									'username' 		=> $value['username'],
@@ -93,7 +114,8 @@ class exportimportusers_module
 										AND user_email = '" . $db->sql_escape($value['user_email']) . "')";
 								$result = $db->sql_query($sql);
 								$row = $db->sql_fetchrow($result);
-								$parsed[$row['user_id']] = array(
+								$parsed[$row['user_id']] = array();
+								$parsed[$row['user_id']] += array(
 									'user_ip'		=> $value['user_ip'],
 									'user_regdate'	=> $value['user_regdate'],
 									'username' 		=> $value['username'],
@@ -103,7 +125,7 @@ class exportimportusers_module
 								$value['user_id'] = $row['user_id'];
 							}
 							$cp_data = array();
-							foreach($profilearay as $id => $fieldvalue)
+							foreach ($profilearay as $id => $fieldvalue)
 							{
 								if (isset($value[$fieldvalue]))
 								{
@@ -112,7 +134,7 @@ class exportimportusers_module
 							}
 						}
 					}
-					unset($parsed_array);
+					//unset($parsed_array);
 					foreach ($user_ids as $userid)
 					{
 						$sql_aray = array(
@@ -126,7 +148,7 @@ class exportimportusers_module
 									'user_birthday'		=> $parsed[$userid]['user_birthday']);
 
 						$cp_data = array();
-						foreach($profilearay as $id => $fieldvalue)
+						foreach ($profilearay as $id => $fieldvalue)
 						{
 							if (isset($parsed[$userid][$fieldvalue]))
 							{
@@ -134,7 +156,7 @@ class exportimportusers_module
 							}
 						}
 
-						if ($request->variable('submit', '') == 'Insert')
+						if ($request->variable('submit', '') == $user->lang['IMPORT'])
 						{
 							$user_id = 0;
 							$sql_aray += array(
@@ -187,6 +209,34 @@ class exportimportusers_module
 							$sql = 'INSERT INTO ' . USERS_TABLE . ' ' . $db->sql_build_array('INSERT', $sql_aray);
 							$db->sql_query($sql);
 							$user_id = $db->sql_nextid();
+
+							if (!class_exists('messenger'))
+							{
+								include($phpbb_root_path . 'includes/functions_messenger.' . $phpEx);
+							}
+							$server_url = generate_board_url();
+							$use_html = ($phpbb_container->get('ext.manager')->is_enabled('forumhulp/htmlemail')) ? true : false;
+							$messenger = new \messenger(true);
+							$messenger->set_mail_priority(MAIL_HIGH_PRIORITY);
+							($use_html) ? $messenger->set_mail_html(true) : null;
+
+							$messenger->headers('X-AntiAbuse: Board servername - ' . $config['server_name']);
+							$messenger->headers('X-AntiAbuse: User_id - ' . $user_id);
+							$messenger->headers('X-AntiAbuse: Username - ' . $sql_aray['username']);
+							$messenger->headers('X-AntiAbuse: User IP - ' . $sql_aray['user_ip']);
+							$messenger->assign_vars(array(
+								'SITE_LOGO_IMG'		=> $server_url . '/ext/forumhulp/exportimportusers/adm/style/css/images/fh_com.jpg',
+								'BOARD_URL'			=> $server_url,
+								'UNAME'				=> $sql_aray['username'],
+								'PASS'				=> $parsed[$userid]['user_password_txt']
+								)
+							);
+
+							$templ = 'export_import.' . (($use_html) ? 'html' : 'txt');
+							$messenger->template('@forumhulp_exportimportusers/' . $templ, $config['default_lang']);
+							$messenger->to($sql_aray['user_email'], $sql_aray['username']);
+							$messenger->send(NOTIFY_EMAIL);
+							$messenger->save_queue();
 						//	$db->sql_return_on_error(false);
 
 							if ($user_id )
@@ -218,9 +268,9 @@ class exportimportusers_module
 
 								$updated[] = '<a href="' . $phpbb_admin_path . 'index.php?i=users&mode=overview&u=' .$user_id . '&amp;sid={_SID}">' . $sql_aray['username'] . '</a>';
 								unset($parsed[$userid]);
-								set_config('newest_user_id', $user_id, true);
-								set_config('newest_username', $sql_aray['username'], true);
-								set_config_count('num_users', 1, true);
+								$config->set('newest_user_id', $user_id, true);
+								$config->set('newest_username', $sql_aray['username'], true);
+								$config->increment('num_users', 1, true);
 							}
 
 						} else
@@ -239,7 +289,7 @@ class exportimportusers_module
 					}
 					if (sizeof($updated))
 					{
-						add_log('admin', 'LOG_USER_CHANGE', implode(', ', $updated));
+						$phpbb_log->add('admin', $user->data['user_id'], $user->ip, 'LOG_USER_CHANGE', false, array(implode(', ', $updated)));
 					}
 
 					if (sizeof($parsed))
@@ -248,7 +298,7 @@ class exportimportusers_module
 						{
 							$notupdated[] = $value['username'];
 						}
-						add_log('admin', 'LOG_USER_ERROR', implode(', ', $notupdated));
+						$phpbb_log->add('admin', $user->data['user_id'], $user->ip, 'LOG_USER_ERROR', false, aaray(implode(', ', $notupdated)));
 					}
 					if (!file_exists($phpbb_root_path . 'store/user_updates'))
 					{
@@ -285,8 +335,26 @@ class exportimportusers_module
 					{
 						$file->clean_filename('avatar', '', 'update_users');
 						$file->move_file(str_replace($phpbb_root_path, '', $upload_dir), true, true, 0775);
+						$viewtable = true;
 					}
 				}
+			break;
+
+			case 'del_history':
+				$dir =  $phpbb_root_path . 'store' . DIRECTORY_SEPARATOR . 'user_updates/';
+				$it = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
+				$files = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::CHILD_FIRST);
+				foreach ($files as $file)
+				{
+					if ($file->isDir())
+					{
+						rmdir($file->getRealPath());
+					} else
+					{
+						unlink($file->getRealPath());
+					}
+				}
+				$viewtable = true;
 			break;
 
 			case 'export':
@@ -306,7 +374,7 @@ class exportimportusers_module
 					$xml .= "\t\t<username>".$row['username']."</username>\n";
 					$xml .= "\t\t<user_email>".$row['user_email']."</user_email>\n";
 					$xml .= "\t\t<user_birthday>".$row['user_birthday']."</user_birthday>\n";
-					foreach($profilearay as $id => $fieldvalue)
+					foreach ($profilearay as $id => $fieldvalue)
 					{
 						if (isset($profile_fields[$row['user_id']][$fieldvalue]))
 						{
@@ -333,14 +401,14 @@ class exportimportusers_module
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
-				'ERROR'		=> sizeof($updated) . ' users updated',
+				'ERROR'		=> $user->lang('USERS_UPDATED', sizeof($updated)),
 				'BOX'		=> 'successbox'
 			));
 		} else if (sizeof($parsed))
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
-				'ERROR'		=> 'Not all users are imported / updated',
+				'ERROR'		=> $user->lang['NOT_ALL_UPDATED'],
 				'BOX'		=> 'errorbox'
 			));
 		} else if (!sizeof($updated && sizeof($error)))
@@ -354,25 +422,40 @@ class exportimportusers_module
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
-				'ERROR'		=> '<br />» More then ' . $maxusertoupdate . ' user\'s to update!',
+				'ERROR'		=> '<br />» ' . $user->lang('MORE_THEN', $maxusertoupdate),
 				'BOX'		=> 'errorbox'
 			));
 		} else if (!file_exists($filename))
 		{
 			$template->assign_vars(array(
 				'S_ERROR'	=> true,
-				'ERROR'		=> 'File "update_users.xml" doesn\'t excists!',
+				'ERROR'		=> $user->lang['FILE_NOT_EXCISTS'],
 				'BOX'		=> 'errorbox'
 			));
 			$parsed_array = array();
 		}
 		if (sizeof($parsed_array))
 		{
+			if (!function_exists('validate_password'))
+			{
+				include_once($phpbb_root_path . 'includes/functions_user.' . $phpEx);
+			}
+
 			foreach ($parsed_array as $key => $value)
 			{
 				$pass = ((strlen($value['user_password']) == 34 && (substr($value['user_password'], 0,3) == '$H$' ||
 						substr($value['user_password'], 0,3) == '$P$')) || (strlen($value['user_password']) == 60 &&
-						(substr($value['user_password'], 0,3) == '$2y')))  ? ' Password ok' : 'Password not ok';
+						(substr($value['user_password'], 0,3) == '$2y'))) ? true : false;
+
+				if (!$pass && $value['user_password'] != '')
+				{
+					 if (validate_password($value['user_password']) === false && validate_string($value['user_password'], false, $config['min_pass_chars'], $config['max_pass_chars']) === false)
+					 {
+						 $value['user_password'] = $password_manager->hash($value['user_password']);
+						 $pass = true;
+					 }
+				}
+
 				$sql = 'SELECT user_id, username, user_password, user_email FROM ' . USERS_TABLE . '
 						WHERE ' . (($value['user_id']) ? 'user_id = ' . $value['user_id'] . ' OR ' : '') . "
 						(username_clean = '" . $db->sql_escape(utf8_clean_string($value['username'])) . "'
@@ -388,9 +471,12 @@ class exportimportusers_module
 						'NEWID'		=> $value['user_id'],
 						'NEWNAME' 	=> $value['username'],
 						'NEWEMAIL'	=> $value['user_email'],
-						'NEWCITY' 	=> $value['phpbb_location'],
-						'TOOLTIP'	=> 'Username: ' . htmlspecialchars($value['username']) . "\n" . 'Password: ' . $pass . "\n" . 'Emailaddress: ' . htmlspecialchars($value['user_email']) . "\n" .	(sizeof($disabled) ? 'Errors:' . implode("\n",  $disabled) : ''),
-						'VALIDATED'	=> (!sizeof($disabled)) ? '&radic;' : '<a style="color:red;" href="'.$this->u_action . '&amp;action=delete&amp;id='.$value['user_id'].'">Delete</a>'
+						'NEWCITY' 	=> (isset($value['phpbb_location'])) ? $value['phpbb_location'] : '',
+						'TOOLTIP'	=> $user->lang['USERNAME'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['username']) . "\n" .
+									   $user->lang['PASSWORD'] . $user->lang['COLON'] . ' ' . (($pass) ? $user->lang['PASS_OK'] : $user->lang['PASS_NOK']) . "\n" .
+									   $user->lang['EMAIL'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['user_email']) .
+									   (sizeof($disabled) ? "\nErrors: " . implode("\n",  $disabled) : ''),
+						'VALIDATED'	=> (!sizeof($disabled)) ? '&radic;' : '<a style="color:red;" href="'.$this->u_action . '&amp;action=delete&amp;id='.$value['user_id'].'">' . $user->lang['DELL'] . '</a>'
 					));
 					$disabledinsert = $disabledinsert & !sizeof($disabled);
 				} else
@@ -408,8 +494,11 @@ class exportimportusers_module
 						'NEWEMAIL'	=> $value['user_email'],
 						'CITY' 		=> isset($profile_fields[$row['user_id']]['phpbb_location']['value']) ? $profile_fields[$row['user_id']]['phpbb_location']['value'] : '',
 						'NEWCITY' 	=> isset($value['phpbb_location']) ? $value['phpbb_location'] : '',
-						'TOOLTIP'	=> 'Username: ' . htmlspecialchars($value['username']) . "\n" . 'Password: ' . $pass . "\n" . 'Emailaddress: ' . htmlspecialchars($value['user_email']) . "\n" . (sizeof($disabled) ? 'Errors:' . implode("\n",  $disabled) : ''),
-						'VALIDATED'	=> (!sizeof($disabled)) ? '&radic;' : '<a style="color:red;" href="'.$this->u_action . '&amp;action=delete&amp;id='.$value['user_id'].'">Delete</a>'
+						'TOOLTIP'	=> $user->lang['USERNAME'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['username']) . "\n" .
+									   $user->lang['PASSWORD'] . $user->lang['COLON'] . ' ' . (($pass) ? $user->lang['PASS_OK'] : $user->lang['PASS_NOK']) . "\n" .
+									   $user->lang['EMAIL'] . $user->lang['COLON'] . ' ' . htmlspecialchars($value['user_email']) .
+									   (sizeof($disabled) ? "\nErrors: " . implode("\n",  $disabled) : ''),
+						'VALIDATED'	=> (!sizeof($disabled)) ? '&radic;' : '<a style="color:red;" href="'.$this->u_action . '&amp;action=delete&amp;id='.$value['user_id'].'">' . $user->lang['DELL'] . '</a>'
 					));
 					$disableupdate = $disableupdate & !sizeof($disabled);
 				}
@@ -418,7 +507,15 @@ class exportimportusers_module
 										'DISABLEUPDATE' => ($disableupdate) ?  '' : 'disabled="disabled"',
 										'MAXEXISTINGUSERS' => $maxusertoupdate));
 		}
-
-	$template->assign_vars(array('U_ACTION' =>  $this->u_action, 'EXPORTURL' => $this->u_action . '&amp;action=export'));
+	
+	foreach (history($phpbb_root_path . '/store/user_updates') as $his)
+	{
+		$template->assign_block_vars('history', array(
+			'USERNAME'		=> $his['username'],
+			'UPDATED'		=> $user->format_date($his['time'], 'j F \'y')
+			)
+		);
+	}
+	$template->assign_vars(array('U_ACTION' => $this->u_action, 'EXPORTURL' => $this->u_action . '&amp;action=export', 'VIEW_TABLE' => $viewtable));
 	}
 }

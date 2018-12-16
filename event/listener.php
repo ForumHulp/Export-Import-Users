@@ -39,7 +39,7 @@ class listener implements EventSubscriberInterface
 	public function edit_additional_data($event)
 	{
 		$additional_data = $event['row'];
-		foreach($additional_data as $key => $value)
+		foreach ($additional_data as $key => $value)
 		{
 			if ($key == 'log_data' && strpos($value, '{_SID}') && $value != '')
 			{
