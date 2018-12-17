@@ -508,13 +508,16 @@ class exportimportusers_module
 										'MAXEXISTINGUSERS' => $maxusertoupdate));
 		}
 	
-	foreach (history($phpbb_root_path . '/store/user_updates') as $his)
+	if (file_exists($phpbb_root_path . '/store/user_updates'))
 	{
-		$template->assign_block_vars('history', array(
-			'USERNAME'		=> $his['username'],
-			'UPDATED'		=> $user->format_date($his['time'], 'j F \'y')
-			)
-		);
+		foreach (history($phpbb_root_path . '/store/user_updates') as $his)
+		{
+			$template->assign_block_vars('history', array(
+				'USERNAME'		=> $his['username'],
+				'UPDATED'		=> $user->format_date($his['time'], 'j F \'y')
+				)
+			);
+		}
 	}
 	$template->assign_vars(array('U_ACTION' => $this->u_action, 'EXPORTURL' => $this->u_action . '&amp;action=export', 'VIEW_TABLE' => $viewtable));
 	}
