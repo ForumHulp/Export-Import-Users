@@ -1,10 +1,10 @@
-Subject: Account imported at "{SITENAME}"
+Subject: Compte utilisateur importé sur « {SITENAME} »
 
 <div style="width:100%;color:#fff;background-color:#051484;height:50px;padding-left:10px;">{SITENAME}</div>
-<img src="{SITE_LOGO_IMG}" alt="" align="right" style="margin: 5px; border: 0px currentColor; float: right;" vspace="5px" hspace="5px" />Hi {UNAME},<br /><br />
-Your account is imported in our site.<br />
-Your username is "{UNAME}" and your password is "{PASS}".
-Please change your password as soon as possible.<br />
-We look forward to see you at <a href="{BOARD_URL}">{SITENAME}</a> again.<br /><br />
+<img src="{SITE_LOGO_IMG}" alt="" align="right" style="margin: 5px; border: 0px currentColor; float: right;" vspace="5px" hspace="5px" />Bonjour {UNAME},<br /><br />
+Votre compte utilisateur a été importé sur notre forum.<br />
+Votre nom d’utilisateur est : « {UNAME} » et votre mot de passe est : « {PASS} ».<br />
+Merci de modifier votre mot de passe aussi tôt que possible.<br />
+Au plaisir de vous voir à nouveau sur « <a href="{BOARD_URL}">{SITENAME}</a> » !<br /><br />
 <br /><br /><br />
 {EMAIL_SIG}
