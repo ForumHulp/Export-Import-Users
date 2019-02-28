@@ -1,10 +1,10 @@
-Subject: Compte utilisateur importé sur « {SITENAME} »
+Subject: Account imported at "{SITENAME}"
 
-Bonjour {UNAME},
-Votre compte utilisateur a été importé sur notre forum.
-Votre nom d’utilisateur est : « {UNAME} » et votre mot de passe est : « {PASS} ».
-Merci de modifier votre mot de passe aussi tôt que possible.
-Au plaisir de vous voir à nouveau sur « {BOARD_URL} » !
+Hi {UNAME},
+Your account is imported in our site.
+Your username is "{UNAME}" and your password is "{PASS}".
+Please change your password as soon as possible.
+We look forward to see you at {BOARD_URL} again.
 
 
 
